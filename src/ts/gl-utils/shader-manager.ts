@@ -32,7 +32,7 @@ function buildShader(infos: IShaderInfos, callback: BuildCallback): void {
 
     function loadedSource(success: boolean): void {
         function processSource(source: string): string {
-            return source.replace(/#INJECT\((.*)\)/mg, (match: string, name: string) => {
+            return source.replace(/#INJECT\(([^)]*)\)/mg, (match: string, name: string) => {
                 if (infos.injected[name]) {
                     return infos.injected[name];
                 }
