@@ -66,6 +66,8 @@ class Drawer {
     private shader: Shader;
 
     public constructor(gl: WebGLRenderingContext, gemstone: Gemstone) {
+        Page.Canvas.showLoader(true);
+
         this.gl = gl;
         this.VBO = new VBO(gl, UNIT_CUBE, 3, gl.FLOAT, true);
 
@@ -133,6 +135,7 @@ class Drawer {
                 CHECK_IF_INSIDE: checkIfInsideInstructions.join(" && "),
             },
         }, (builtShader: Shader | null) => {
+            Page.Canvas.showLoader(false);
             if (builtShader !== null) {
                 this.shader = builtShader;
             } else {
