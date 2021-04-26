@@ -1,3 +1,4 @@
+import { Gemstone } from "./gemstone";
 import { Shader } from "./gl-utils/shader";
 import * as ShaderManager from "./gl-utils/shader-manager";
 import { VBO } from "./gl-utils/vbo";
@@ -64,17 +65,17 @@ class Drawer {
 
     private shader: Shader;
 
-    public constructor(gl: WebGLRenderingContext) {
+    public constructor(gl: WebGLRenderingContext, gemstone: Gemstone) {
         this.gl = gl;
         this.VBO = new VBO(gl, UNIT_CUBE, 3, gl.FLOAT, true);
 
         this.pMatrix = mat4.create();
         this.mvpMatrix = mat4.create();
-        this.camera = new OrbitalCamera([0, 0, 0], 2);
+        this.camera = new OrbitalCamera([0, 0, 0], 1.8);
         this.camera.phi = 1.1;
         this.camera.theta = 2;
 
-        const EPSILON = 1.0;
+        const EPSILON = 0.2;
         const minPhi = EPSILON;
         const maxPhi = Math.PI - EPSILON;
         Page.Canvas.Observers.mouseDrag.push((dX: number, dY: number) => {
@@ -84,7 +85,7 @@ class Drawer {
             this.updateMVPMatrix();
         });
 
-        const minDist = 2;
+        const minDist = 1.8;
         const maxDist = 8;
         Page.Canvas.Observers.mouseWheel.push((delta: number) => {
             let d = this.camera.distance + 0.2 * delta;
@@ -111,10 +112,26 @@ class Drawer {
         Parameters.addBackgroundColorObserver(updateBackgroundColor);
         updateBackgroundColor();
 
+        const facetsDefinitionInstructions: string[] = [];
+        const computeEntryPointInstructions: string[] = [];
+        const checkIfInsideInstructions: string[] = [];
+        for (let i = 0; i < gemstone.facets.length; i++) {
+            const facet = gemstone.facets[i];
+            facetsDefinitionInstructions.push(`const vec3 FACET_${i}_POINT = vec3(${facet.point.x},${facet.point.y},${facet.point.z});`);
+            facetsDefinitionInstructions.push(`const vec3 FACET_${i}_NORMAL = vec3(${facet.normal.x},${facet.normal.y},${facet.normal.z});`);
+
+            computeEntryPointInstructions.push(`computeIntersectionWithPlane(FACET_${i}_POINT, FACET_${i}_NORMAL, uEyePosition, fromEyeNormalized, theta, normal);`);
+            checkIfInsideInstructions.push(`isInside(FACET_${i}_POINT, FACET_${i}_NORMAL, finalPosition)`);
+        }
+
         ShaderManager.buildShader({
             fragmentFilename: "shader.frag",
             vertexFilename: "shader.vert",
-            injected: {},
+            injected: {
+                FACETS_DEFINITION: facetsDefinitionInstructions.join("\n\t"),
+                COMPUTE_ENTRY_POINT: computeEntryPointInstructions.join("\n\t"),
+                CHECK_IF_INSIDE: checkIfInsideInstructions.join(" && "),
+            },
         }, (builtShader: Shader | null) => {
             if (builtShader !== null) {
                 this.shader = builtShader;

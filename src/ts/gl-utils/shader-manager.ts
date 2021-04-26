@@ -54,7 +54,7 @@ function buildShader(infos: IShaderInfos, callback: BuildCallback): void {
 
                 const processedVert = processSource(vert);
                 const processedFrag = processSource(frag);
-
+                console.log(processedFrag);
                 shader = new Shader(gl, processedVert, processedFrag);
             }
 

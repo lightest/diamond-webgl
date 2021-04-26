@@ -3,6 +3,7 @@ import { gl } from "./gl-utils/gl-canvas";
 import { Viewport } from "./gl-utils/viewport";
 
 import { Drawer } from "./drawer";
+import { Gemstone } from "./gemstone";
 
 import "./page-interface-generated";
 
@@ -21,7 +22,8 @@ function main(): void {
     }
     Page.Canvas.Observers.canvasResize.push(() => { needToAdjustCanvasSize = true; });
 
-    const drawer = new Drawer(gl);
+    const gemstone = new Gemstone();
+    const drawer = new Drawer(gl, gemstone);
 
     let timeOfLastFPSUpdate = performance.now();
     let framesSinceLastFPSUpdate = 0;
