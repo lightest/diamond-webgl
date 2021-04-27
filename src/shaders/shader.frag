@@ -74,8 +74,8 @@ float computeInternalIntersection(const vec3 position, const vec3 direction, out
     return theta;
 }
 
-vec4 sampleSkybox(const vec3 direction) {
-    return vec4(vec3(step(-1.0, direction.z) * step(direction.z, 1.0)), 1);
+vec3 sampleSkybox(const vec3 direction) {
+    return vec3(1) * (0.5 + 0.5 * (step(0.7, direction.z) * step(direction.z, 0.9)));
 }
 
 /** @param interfaceEtaRatio eta_current / eta_other */
@@ -112,27 +112,31 @@ void main(void) {
     vec3 currentDirection = entryRefractedRay;
     float totalDepthInside = 0.0;
 
-    vec4 insideColor  = vec4(vec3(1), 0);
-
+    vec3 insideColor  = vec3(0);
+    float rayStrength = 1.0;
     const int rayDepth = #INJECT(RAY_DEPTH);
     for (int i = 0; i < rayDepth; i ++) {
         vec3 currentFacetNormal;
         float theta = computeInternalIntersection(currentPoint, currentDirection, currentFacetNormal);
 
         totalDepthInside += theta;
+        vec3 refractedRay = refract(currentDirection, currentFacetNormal, uRefractionInfo.x);
+        float fresnelReflection = computeFresnelReflection(currentDirection, currentFacetNormal, refractedRay, uRefractionInfo.z, uRefractionInfo.w);
+
+        insideColor += (1.0 - fresnelReflection) * sampleSkybox(refractedRay) * exp(-uAbsorption * totalDepthInside);
+        rayStrength *= fresnelReflection;
+
         currentPoint += theta * currentDirection;
         currentDirection = reflect(currentDirection, currentFacetNormal);
-        insideColor.rgb = vec3(0.5 + 0.5 * currentFacetNormal);
     }
 
-    vec4 normalAsColor = vec4(vec3(0.5 + 0.5 * entryFacetNormal), 1);
-    insideColor = mix(insideColor, normalAsColor, uDisplayNormals) + 0.000000001 * uAbsorption.x;
-
-    // vec4 color = vec4(exp(- uAbsorption * totalDepthInside), 1);
+    vec3 normalAsColor = vec3(0.5 + 0.5 * entryFacetNormal);
+    insideColor = mix(insideColor, normalAsColor, uDisplayNormals);
 
     vec3 entryReflectedRay = reflect(fromEyeNormalized, entryFacetNormal);
-    vec4 reflectedColor = sampleSkybox(entryReflectedRay);
+    vec3 reflectedColor = sampleSkybox(entryReflectedRay);
 
     float fresnelReflection = computeFresnelReflection(fromEyeNormalized, entryFacetNormal, entryRefractedRay, uRefractionInfo.x, uRefractionInfo.y);
-    gl_FragColor = mix(insideColor, reflectedColor, fresnelReflection);
+    vec3 finalColor = mix(insideColor, reflectedColor, fresnelReflection);
+    gl_FragColor = vec4(finalColor, 1);
 }
