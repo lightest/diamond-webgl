@@ -48,6 +48,10 @@ float computeInternalIntersection(const vec3 position, const vec3 direction) {
     return theta;
 }
 
+vec3 sampleSkybox(const vec3 normal) {
+    return vec3(step(0.7, normal.z) * step(normal.z, 0.8));
+}
+
 void main(void) {
     if (abs(vPosition.x) >= MAX && abs(vPosition.y) >= MAX && abs(vPosition.z) >= MAX) {
         gl_FragColor = vec4(vec3(1, 0, 0), 1);
@@ -66,13 +70,15 @@ void main(void) {
     }
 
     vec3 entryPoint = uEyePosition + theta * fromEyeNormalized;
+    vec3 reflectedRayAtEntryPoint = reflect(fromEyeNormalized, normal);
     if (!(#INJECT(CHECK_IF_INSIDE))) {
         discard;
     }
 
     float depth = computeInternalIntersection(entryPoint, fromEyeNormalized);
 
+    vec4 reflectedColor = vec4(sampleSkybox(reflectedRayAtEntryPoint), 1);
     vec4 normalAsColor = vec4(vec3(0.5 + 0.5 * normal), 1);
     vec4 color = vec4(exp(-uAbsorption * depth), 1);
-    gl_FragColor = mix(color, normalAsColor, uDisplayNormals);
+    gl_FragColor = mix(color, normalAsColor, uDisplayNormals) + reflectedColor;
 }
