@@ -29,6 +29,26 @@ const data = {
     },
     controlsSections: [
         {
+            title: "Gem",
+            controls: [
+                {
+                    type: Demopage.supportedControls.ColorPicker,
+                    title: "Color",
+                    id: "gem-color-picker-id",
+                    defaultValueHex: "#FF0000",
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Absorption",
+                    id: "absorbtion-range-id",
+                    min: 0,
+                    max: 10,
+                    value: 1,
+                    step: 0.1
+                },
+            ],
+        },
+        {
             title: "Display",
             controls: [
                 {
@@ -42,6 +62,17 @@ const data = {
                     title: "Indicators",
                     id: "display-indicators-checkbox-id",
                     checked: true,
+                },
+            ]
+        },
+        {
+            title: "Debug",
+            controls: [
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Display normals",
+                    id: "display-normals-checkbox-id",
+                    checked: false,
                 },
             ]
         }

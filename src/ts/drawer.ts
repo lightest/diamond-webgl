@@ -117,22 +117,28 @@ class Drawer {
         const facetsDefinitionInstructions: string[] = [];
         const computeEntryPointInstructions: string[] = [];
         const checkIfInsideInstructions: string[] = [];
+        const computeInternalIntersectionInstructions: string[] = [];
         for (let i = 0; i < gemstone.facets.length; i++) {
             const facet = gemstone.facets[i];
-            facetsDefinitionInstructions.push(`const vec3 FACET_${i}_POINT = vec3(${facet.point.x},${facet.point.y},${facet.point.z});`);
-            facetsDefinitionInstructions.push(`const vec3 FACET_${i}_NORMAL = vec3(${facet.normal.x},${facet.normal.y},${facet.normal.z});`);
+            const facetPointName = `FACET_${i}_POINT`;
+            const facetNormalName = `FACET_${i}_NORMAL`;
 
-            computeEntryPointInstructions.push(`computeIntersectionWithPlane(FACET_${i}_POINT, FACET_${i}_NORMAL, uEyePosition, fromEyeNormalized, theta, normal);`);
-            checkIfInsideInstructions.push(`isInside(FACET_${i}_POINT, FACET_${i}_NORMAL, finalPosition)`);
+            facetsDefinitionInstructions.push(`const vec3 ${facetPointName} = vec3(${facet.point.x},${facet.point.y},${facet.point.z});`);
+            facetsDefinitionInstructions.push(`const vec3 ${facetNormalName} = vec3(${facet.normal.x},${facet.normal.y},${facet.normal.z});`);
+
+            computeEntryPointInstructions.push(`computeIntersectionWithPlane(${facetPointName}, ${facetNormalName}, uEyePosition, fromEyeNormalized, theta, normal);`);
+            checkIfInsideInstructions.push(`isInside(${facetPointName}, ${facetNormalName}, entryPoint)`);
+            computeInternalIntersectionInstructions.push(`theta = min(theta, checkNextInternalIntersection(${facetPointName}, ${facetNormalName}, position, direction));`);
         }
 
         ShaderManager.buildShader({
             fragmentFilename: "shader.frag",
             vertexFilename: "shader.vert",
             injected: {
-                FACETS_DEFINITION: facetsDefinitionInstructions.join("\n\t"),
+                FACETS_DEFINITION: facetsDefinitionInstructions.join("\n"),
                 COMPUTE_ENTRY_POINT: computeEntryPointInstructions.join("\n\t"),
                 CHECK_IF_INSIDE: checkIfInsideInstructions.join(" && "),
+                COMPUTE_INTERNAL_INTERSECTION: computeInternalIntersectionInstructions.join("\n\t"),
             },
         }, (builtShader: Shader | null) => {
             Page.Canvas.showLoader(false);
@@ -149,9 +155,19 @@ class Drawer {
 
         if (this.shader) {
             Page.Canvas.showLoader(false);
+
+            const gemColor = Parameters.gemColor;
+            const gemAbsorption = Parameters.absorption;
+
             this.shader.a["aPosition"].VBO = this.VBO;
             this.shader.u["uMVPMatrix"].value = this.mvpMatrix;
             this.shader.u["uEyePosition"].value = this.camera.eyePos;
+            this.shader.u["uAbsorption"].value = [
+                gemAbsorption * (1 - gemColor.r / 255),
+                gemAbsorption * (1 - gemColor.g / 255),
+                gemAbsorption * (1 - gemColor.b / 255),
+            ];
+            this.shader.u["uDisplayNormals"].value = Parameters.displayNormals ? 1 : 0;
 
             this.shader.use();
             this.shader.bindUniformsAndAttributes();
