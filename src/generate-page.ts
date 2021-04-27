@@ -32,6 +32,15 @@ const data = {
             title: "Gem",
             controls: [
                 {
+                    type: Demopage.supportedControls.Range,
+                    title: "Refraction",
+                    id: "refraction-range-id",
+                    min: 1,
+                    max: 2,
+                    value: 1.18,
+                    step: 0.01
+                },
+                {
                     type: Demopage.supportedControls.ColorPicker,
                     title: "Color",
                     id: "gem-color-picker-id",
@@ -40,11 +49,20 @@ const data = {
                 {
                     type: Demopage.supportedControls.Range,
                     title: "Absorption",
-                    id: "absorbtion-range-id",
+                    id: "absorption-range-id",
                     min: 0,
                     max: 10,
                     value: 1,
                     step: 0.1
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Ray depth",
+                    id: "ray-depth-range-id",
+                    min: 0,
+                    max: 20,
+                    value: 5,
+                    step: 1
                 },
             ],
         },
@@ -57,12 +75,6 @@ const data = {
                     id: "background-color-picker-id",
                     defaultValueHex: "#000000",
                 },
-                {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Indicators",
-                    id: "display-indicators-checkbox-id",
-                    checked: true,
-                },
             ]
         },
         {
@@ -73,6 +85,12 @@ const data = {
                     title: "Display normals",
                     id: "display-normals-checkbox-id",
                     checked: false,
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Indicators",
+                    id: "display-indicators-checkbox-id",
+                    checked: true,
                 },
             ]
         }

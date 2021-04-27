@@ -114,40 +114,11 @@ class Drawer {
         Parameters.addBackgroundColorObserver(updateBackgroundColor);
         updateBackgroundColor();
 
-        const facetsDefinitionInstructions: string[] = [];
-        const computeEntryPointInstructions: string[] = [];
-        const checkIfInsideInstructions: string[] = [];
-        const computeInternalIntersectionInstructions: string[] = [];
-        for (let i = 0; i < gemstone.facets.length; i++) {
-            const facet = gemstone.facets[i];
-            const facetPointName = `FACET_${i}_POINT`;
-            const facetNormalName = `FACET_${i}_NORMAL`;
-
-            facetsDefinitionInstructions.push(`const vec3 ${facetPointName} = vec3(${facet.point.x},${facet.point.y},${facet.point.z});`);
-            facetsDefinitionInstructions.push(`const vec3 ${facetNormalName} = vec3(${facet.normal.x},${facet.normal.y},${facet.normal.z});`);
-
-            computeEntryPointInstructions.push(`computeIntersectionWithPlane(${facetPointName}, ${facetNormalName}, uEyePosition, fromEyeNormalized, theta, normal);`);
-            checkIfInsideInstructions.push(`isInside(${facetPointName}, ${facetNormalName}, entryPoint)`);
-            computeInternalIntersectionInstructions.push(`theta = min(theta, checkNextInternalIntersection(${facetPointName}, ${facetNormalName}, position, direction));`);
-        }
-
-        ShaderManager.buildShader({
-            fragmentFilename: "shader.frag",
-            vertexFilename: "shader.vert",
-            injected: {
-                FACETS_DEFINITION: facetsDefinitionInstructions.join("\n"),
-                COMPUTE_ENTRY_POINT: computeEntryPointInstructions.join("\n\t"),
-                CHECK_IF_INSIDE: checkIfInsideInstructions.join(" && "),
-                COMPUTE_INTERNAL_INTERSECTION: computeInternalIntersectionInstructions.join("\n\t"),
-            },
-        }, (builtShader: Shader | null) => {
-            Page.Canvas.showLoader(false);
-            if (builtShader !== null) {
-                this.shader = builtShader;
-            } else {
-                Page.Demopage.setErrorMessage(`shader_load_fail`, `Failed to load/build the shader.`);
-            }
-        });
+        const recomputeShader = () => {
+            this.updateShader(gemstone);
+        };
+        Parameters.addRecomputeShaderObservers(recomputeShader);
+        recomputeShader();
     }
 
     public draw(): void {
@@ -168,6 +139,7 @@ class Drawer {
                 gemAbsorption * (1 - gemColor.b / 255),
             ];
             this.shader.u["uDisplayNormals"].value = Parameters.displayNormals ? 1 : 0;
+            this.shader.u["uRefractionIndex"].value = Parameters.refractionIndex;
 
             this.shader.use();
             this.shader.bindUniformsAndAttributes();
@@ -178,6 +150,49 @@ class Drawer {
     private updateMVPMatrix(): void {
         mat4.perspective(this.pMatrix, 45, Page.Canvas.getAspectRatio(), 0.1, 100.0);
         mat4.multiply(this.mvpMatrix, this.pMatrix, this.camera.viewMatrix);
+    }
+
+    private updateShader(gemstone: Gemstone): void {
+        const facetsDefinitionInstructions: string[] = [];
+        const computeEntryPointInstructions: string[] = [];
+        const checkIfInsideInstructions: string[] = [];
+        const computeInternalIntersectionInstructions: string[] = [];
+        for (let i = 0; i < gemstone.facets.length; i++) {
+            const facet = gemstone.facets[i];
+            const facetPointName = `FACET_${i}_POINT`;
+            const facetNormalName = `FACET_${i}_NORMAL`;
+
+            facetsDefinitionInstructions.push(`const vec3 ${facetPointName} = vec3(${facet.point.x},${facet.point.y},${facet.point.z});`);
+            facetsDefinitionInstructions.push(`const vec3 ${facetNormalName} = vec3(${facet.normal.x},${facet.normal.y},${facet.normal.z});`);
+
+            computeEntryPointInstructions.push(`computeIntersectionWithPlane(${facetPointName}, ${facetNormalName}, uEyePosition, fromEyeNormalized, theta, facetNormal);`);
+            checkIfInsideInstructions.push(`isInside(${facetPointName}, ${facetNormalName}, entryPoint)`);
+            computeInternalIntersectionInstructions.push(`checkNextInternalIntersection(${facetPointName}, ${facetNormalName}, position, direction, theta, facetNormal);`);
+        }
+
+        ShaderManager.buildShader({
+            fragmentFilename: "shader.frag",
+            vertexFilename: "shader.vert",
+            injected: {
+                FACETS_DEFINITION: facetsDefinitionInstructions.join("\n"),
+                COMPUTE_ENTRY_POINT: computeEntryPointInstructions.join("\n\t"),
+                CHECK_IF_INSIDE: checkIfInsideInstructions.join(" && "),
+                COMPUTE_INTERNAL_INTERSECTION: computeInternalIntersectionInstructions.join("\n\t"),
+                RAY_DEPTH: Parameters.rayDepth.toString(),
+            },
+        }, (builtShader: Shader | null) => {
+            Page.Canvas.showLoader(false);
+            if (this.shader) {
+                this.shader.freeGLResources();
+                this.shader = undefined;
+            }
+
+            if (builtShader !== null) {
+                this.shader = builtShader;
+            } else {
+                Page.Demopage.setErrorMessage(`shader_load_fail`, `Failed to load/build the shader.`);
+            }
+        });
     }
 }
 

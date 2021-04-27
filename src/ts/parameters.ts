@@ -2,14 +2,24 @@ import "./page-interface-generated";
 
 /* === IDs ============================================================ */
 const controlId = {
+    REFRACTION_RANGE_ID: "refraction-range-id",
     GEM_COLOR_PICKER: "gem-color-picker-id",
-    GEM_ABSOPTION_RANGE_ID: "absorbtion-range-id",
+    GEM_ABSOPTION_RANGE_ID: "absorption-range-id",
+    RAY_DEPTH_RANGE_ID: "ray-depth-range-id",
     BACKGROUND_COLOR_PICKER: "background-color-picker-id",
     DISPLAY_INDICATORS: "display-indicators-checkbox-id",
     DISPLAY_NORMALS: "display-normals-checkbox-id",
 };
 
 type Observer = () => unknown;
+
+const recomputeShaderObservers: Observer[] = [];
+function callRecomputeShaderObservers(): void {
+    for (const observer of recomputeShaderObservers) {
+        observer();
+    }
+}
+Page.Range.addLazyObserver(controlId.RAY_DEPTH_RANGE_ID, callRecomputeShaderObservers);
 
 function updateIndicatorsVisibility(): void {
     const visible = Page.Checkbox.isChecked(controlId.DISPLAY_INDICATORS);
@@ -50,6 +60,10 @@ Page.ColorPicker.addObserver(controlId.GEM_COLOR_PICKER, updateGemColor);
 updateGemColor();
 
 abstract class Parameters {
+    public static get refractionIndex(): number {
+        return Page.Range.getValue(controlId.REFRACTION_RANGE_ID);
+    }
+
     public static get backgroundColor(): IRGB {
         return backgroundColor;
     }
@@ -62,12 +76,20 @@ abstract class Parameters {
         return Page.Range.getValue(controlId.GEM_ABSOPTION_RANGE_ID);
     }
 
+    public static get rayDepth(): number {
+        return Math.ceil(Page.Range.getValue(controlId.RAY_DEPTH_RANGE_ID));
+    }
+
     public static get displayNormals(): boolean {
         return Page.Checkbox.isChecked(controlId.DISPLAY_NORMALS);
     }
 
     public static addBackgroundColorObserver(observer: Observer): void {
         backgroundColorChangeObservers.push(observer);
+    }
+
+    public static addRecomputeShaderObservers(observer: Observer): void {
+        recomputeShaderObservers.push(observer);
     }
 }
 

@@ -7,6 +7,7 @@ precision mediump float;
 uniform vec3 uEyePosition;
 uniform vec3 uAbsorption;
 uniform float uDisplayNormals;
+uniform float uRefractionIndex;
 
 varying vec3 vPosition; // in [-0.5,+0.5]^3
 
@@ -33,23 +34,28 @@ bool isInside(const vec3 planePoint, const vec3 planeNormal, const vec3 position
     return dot(planePoint - position, planeNormal) >= -0.00001;
 }
 
-float checkNextInternalIntersection(const vec3 planePoint, const vec3 planeNormal, const vec3 position, const vec3 direction) {
-    float theta = 100000.0;
+float checkNextInternalIntersection(const vec3 planePoint, const vec3 planeNormal, const vec3 position, const vec3 direction, inout float theta, inout vec3 facetNormal) {
+    float localTheta = 100000.0;
     float b = dot(direction, planeNormal);
     if (b > 0.0) {
-        theta = dot(planePoint - position, planeNormal) / b;
+        localTheta = dot(planePoint - position, planeNormal) / b;
+
+        if (localTheta < theta) {
+            facetNormal = planeNormal;
+            theta = localTheta;
+        }
     }
     return theta;
 }
 
-float computeInternalIntersection(const vec3 position, const vec3 direction) {
+float computeInternalIntersection(const vec3 position, const vec3 direction, inout vec3 facetNormal) {
     float theta = 100000.0;
     #INJECT(COMPUTE_INTERNAL_INTERSECTION)
     return theta;
 }
 
-vec3 sampleSkybox(const vec3 normal) {
-    return vec3(step(0.7, normal.z) * step(normal.z, 0.8));
+vec4 sampleSkybox(const vec3 normal) {
+    return vec4(vec3(step(0.7, normal.z) * step(normal.z, 0.8)), 1);
 }
 
 void main(void) {
@@ -61,7 +67,7 @@ void main(void) {
     vec3 fromEyeNormalized = normalize(vPosition - uEyePosition);
 
     float theta = -1.0;
-    vec3 normal = vec3(0);
+    vec3 facetNormal;
 
     #INJECT(COMPUTE_ENTRY_POINT)
 
@@ -70,15 +76,26 @@ void main(void) {
     }
 
     vec3 entryPoint = uEyePosition + theta * fromEyeNormalized;
-    vec3 reflectedRayAtEntryPoint = reflect(fromEyeNormalized, normal);
+    vec3 reflectedRayAtEntryPoint = reflect(fromEyeNormalized, facetNormal);
     if (!(#INJECT(CHECK_IF_INSIDE))) {
         discard;
     }
 
-    float depth = computeInternalIntersection(entryPoint, fromEyeNormalized);
+    vec3 currentPoint = entryPoint;
+    vec3 currentDirection = refract(fromEyeNormalized, facetNormal, 1.0 / uRefractionIndex);
+    float totalDepthInside = 0.0;
 
-    vec4 reflectedColor = vec4(sampleSkybox(reflectedRayAtEntryPoint), 1);
-    vec4 normalAsColor = vec4(vec3(0.5 + 0.5 * normal), 1);
-    vec4 color = vec4(exp(-uAbsorption * depth), 1);
+    const int rayDepth = #INJECT(RAY_DEPTH);
+    for (int i = 0; i < rayDepth; i++) {
+        theta = computeInternalIntersection(currentPoint, currentDirection, facetNormal);
+
+        totalDepthInside += theta;
+        currentPoint += theta * currentDirection;
+        currentDirection = reflect(currentDirection, facetNormal);
+    }
+
+    vec4 reflectedColor = sampleSkybox(reflectedRayAtEntryPoint);
+    vec4 normalAsColor = vec4(vec3(0.5 + 0.5 * facetNormal), 1);
+    vec4 color = vec4(exp(-uAbsorption * totalDepthInside), 1);
     gl_FragColor = mix(color, normalAsColor, uDisplayNormals) + reflectedColor;
 }
