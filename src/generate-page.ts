@@ -36,8 +36,8 @@ const data = {
                     title: "Refraction",
                     id: "refraction-range-id",
                     min: 1,
-                    max: 2,
-                    value: 1.18,
+                    max: 3,
+                    value: 2.42,
                     step: 0.01
                 },
                 {
