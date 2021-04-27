@@ -55,6 +55,8 @@ const UNIT_CUBE = new Float32Array([
 ]);
 
 
+const REFRACTION_INDEX_AIR = 1.0;
+
 class Drawer {
     private readonly gl: WebGLRenderingContext;
     private readonly VBO: VBO;
@@ -129,6 +131,7 @@ class Drawer {
 
             const gemColor = Parameters.gemColor;
             const gemAbsorption = Parameters.absorption;
+            const refractionIndexGem = Parameters.refractionIndex;
 
             this.shader.a["aPosition"].VBO = this.VBO;
             this.shader.u["uMVPMatrix"].value = this.mvpMatrix;
@@ -139,7 +142,12 @@ class Drawer {
                 gemAbsorption * (1 - gemColor.b / 255),
             ];
             this.shader.u["uDisplayNormals"].value = Parameters.displayNormals ? 1 : 0;
-            this.shader.u["uRefractionIndex"].value = Parameters.refractionIndex;
+            this.shader.u["uRefractionInfo"].value = [
+                refractionIndexGem / REFRACTION_INDEX_AIR,
+                (refractionIndexGem / REFRACTION_INDEX_AIR < 1) ? Math.cos(Math.asin(refractionIndexGem / REFRACTION_INDEX_AIR)) : -1,
+                REFRACTION_INDEX_AIR / refractionIndexGem,
+                (REFRACTION_INDEX_AIR / refractionIndexGem < 1) ? Math.cos(Math.asin(REFRACTION_INDEX_AIR / refractionIndexGem)) : -1,
+            ];
 
             this.shader.use();
             this.shader.bindUniformsAndAttributes();

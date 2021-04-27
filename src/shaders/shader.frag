@@ -7,7 +7,12 @@ precision mediump float;
 uniform vec3 uEyePosition;
 uniform vec3 uAbsorption;
 uniform float uDisplayNormals;
-uniform float uRefractionIndex;
+
+// x: eta_gem / eta_air
+// y: cos(critical_angle_when_entering_gem)
+// z: eta_air / eta_gem
+// w: cos(critical_angle_when_entering_air)
+uniform vec4 uRefractionInfo;
 
 varying vec3 vPosition; // in [-0.5,+0.5]^3
 
@@ -70,16 +75,20 @@ float computeInternalIntersection(const vec3 position, const vec3 direction, out
 }
 
 vec4 sampleSkybox(const vec3 direction) {
-    return vec4(vec3(step(0.7, direction.z) * step(direction.z, 0.8)), 1);
+    return vec4(vec3(step(-1.0, direction.z) * step(direction.z, 1.0)), 1);
 }
 
-// external to internal
-float computeFresnelReflection(const vec3 incidentRay, const vec3 surfaceNormal, const vec3 refractedRay) {
-    float cosIncident = abs(dot(-surfaceNormal, incidentRay));
-    float cosRefracted = abs(dot(surfaceNormal, refractedRay));
+/** @param interfaceEtaRatio eta_current / eta_other */
+float computeFresnelReflection(const vec3 incidentRay, const vec3 surfaceNormal, const vec3 refractedRay, const float interfaceEtaRatio, const float cosCriticalAngle) {
+    float cosIncident = abs(dot(surfaceNormal, incidentRay));
 
-    float etaCosRefracted = uRefractionIndex * cosRefracted;
-    float etaCosIncident = uRefractionIndex * cosIncident;
+    if (cosIncident < cosCriticalAngle) {
+        return 1.0;
+    }
+
+    float cosRefracted = abs(dot(surfaceNormal, refractedRay));
+    float etaCosRefracted = interfaceEtaRatio * cosRefracted;
+    float etaCosIncident = interfaceEtaRatio * cosIncident;
 
     float a = (cosIncident - etaCosRefracted) / (cosIncident + etaCosRefracted);
     float b = (etaCosIncident - cosRefracted) / (etaCosIncident + cosRefracted);
@@ -97,7 +106,7 @@ void main(void) {
     vec3 entryPoint;
     vec3 entryFacetNormal;
     computeEntryPoint(uEyePosition, fromEyeNormalized, entryPoint, entryFacetNormal);
-    vec3 entryRefractedRay = refract(fromEyeNormalized, entryFacetNormal, 1.0 / uRefractionIndex);
+    vec3 entryRefractedRay = refract(fromEyeNormalized, entryFacetNormal, uRefractionInfo.z);
 
     vec3 currentPoint = entryPoint;
     vec3 currentDirection = entryRefractedRay;
@@ -107,12 +116,13 @@ void main(void) {
 
     const int rayDepth = #INJECT(RAY_DEPTH);
     for (int i = 0; i < rayDepth; i ++) {
-        vec3 facetNormal;
-        float theta = computeInternalIntersection(currentPoint, currentDirection, facetNormal);
+        vec3 currentFacetNormal;
+        float theta = computeInternalIntersection(currentPoint, currentDirection, currentFacetNormal);
 
         totalDepthInside += theta;
         currentPoint += theta * currentDirection;
-        currentDirection = reflect(currentDirection, facetNormal);
+        currentDirection = reflect(currentDirection, currentFacetNormal);
+        insideColor.rgb = vec3(0.5 + 0.5 * currentFacetNormal);
     }
 
     vec4 normalAsColor = vec4(vec3(0.5 + 0.5 * entryFacetNormal), 1);
@@ -123,6 +133,6 @@ void main(void) {
     vec3 entryReflectedRay = reflect(fromEyeNormalized, entryFacetNormal);
     vec4 reflectedColor = sampleSkybox(entryReflectedRay);
 
-    float fresnelReflection = computeFresnelReflection(fromEyeNormalized, entryFacetNormal, entryRefractedRay);
-    gl_FragColor = mix(normalAsColor, reflectedColor, fresnelReflection);
+    float fresnelReflection = computeFresnelReflection(fromEyeNormalized, entryFacetNormal, entryRefractedRay, uRefractionInfo.x, uRefractionInfo.y);
+    gl_FragColor = mix(insideColor, reflectedColor, fresnelReflection);
 }
