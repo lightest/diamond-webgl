@@ -65,22 +65,20 @@ class Drawer {
 
     private readonly camera: OrbitalCamera;
 
-    private shader: Shader;
+    private gemstone: Gemstone;
 
     private geometryVBO: WebGLBuffer;
-    private nbTriangles: number;
+    private shader: Shader;
+
     private raytracedVolumeShader: Shader;
 
-    public constructor(gl: WebGLRenderingContext, gemstone: Gemstone) {
+    public constructor(gl: WebGLRenderingContext) {
         Page.Canvas.showLoader(true);
 
         this.gl = gl;
         this.cubeVBO = new VBO(gl, UNIT_CUBE, 3, gl.FLOAT, true);
 
         this.geometryVBO = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.geometryVBO);
-        gl.bufferData(gl.ARRAY_BUFFER, gemstone.bufferData, gl.STATIC_DRAW);
-        this.nbTriangles = gemstone.nbTriangles;
 
         this.pMatrix = mat4.create();
         this.mvpMatrix = mat4.create();
@@ -125,17 +123,24 @@ class Drawer {
         Parameters.addBackgroundColorObserver(updateBackgroundColor);
         updateBackgroundColor();
 
-        const recomputeShader = () => {
-            this.updateShader(gemstone);
-        };
+        const recomputeShader = () => { this.recomputeShader(); };
         Parameters.addRecomputeShaderObservers(recomputeShader);
-        recomputeShader();
+    }
+
+    public setGemstone(gemstone: Gemstone): void {
+        this.gemstone = gemstone;
+
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.geometryVBO);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, gemstone.bufferData, this.gl.STATIC_DRAW);
+
+        this.recomputeShader();
+        this.recomputeRaytracedVolumeShader();
     }
 
     public draw(): void {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-        if (this.shader) {
+        if (this.shader && this.gemstone) {
             Page.Canvas.showLoader(false);
 
             const gemColor = Parameters.gemColor;
@@ -171,14 +176,14 @@ class Drawer {
             this.gl.vertexAttribPointer(aNormalLoc, 3, this.gl.FLOAT, false, 2 * 3 * BYTES_PER_FLOAT, 3 * BYTES_PER_FLOAT);
 
             this.shader.bindUniformsAndAttributes();
-            this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 * this.nbTriangles);
+            this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 * this.gemstone.nbTriangles);
         }
     }
 
     public drawDebugVolume(): void {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-        if (this.raytracedVolumeShader) {
+        if (this.raytracedVolumeShader && this.gemstone) {
             Page.Canvas.showLoader(false);
 
             this.raytracedVolumeShader.a["aPosition"].VBO = this.cubeVBO;
@@ -196,21 +201,17 @@ class Drawer {
         mat4.multiply(this.mvpMatrix, this.pMatrix, this.camera.viewMatrix);
     }
 
-    private updateShader(gemstone: Gemstone): void {
+    private recomputeShader(): void {
         const facetsDefinitionInstructions: string[] = [];
-        const computeEntryPointInstructions: string[] = [];
-        const checkIfInsideInstructions: string[] = [];
         const computeInternalIntersectionInstructions: string[] = [];
-        for (let i = 0; i < gemstone.facets.length; i++) {
-            const facet = gemstone.facets[i];
+        for (let i = 0; i < this.gemstone.facets.length; i++) {
+            const facet = this.gemstone.facets[i];
             const facetPointName = `FACET_${i}_POINT`;
             const facetNormalName = `FACET_${i}_NORMAL`;
 
             facetsDefinitionInstructions.push(`const vec3 ${facetPointName} = vec3(${facet.point.x},${facet.point.y},${facet.point.z});`);
             facetsDefinitionInstructions.push(`const vec3 ${facetNormalName} = vec3(${facet.normal.x},${facet.normal.y},${facet.normal.z});`);
 
-            computeEntryPointInstructions.push(`computeIntersectionWithPlane(${facetPointName}, ${facetNormalName}, eyePosition, fromEyeNormalized, theta, facetNormal);`);
-            checkIfInsideInstructions.push(`isInside(${facetPointName}, ${facetNormalName}, entryPoint)`);
             computeInternalIntersectionInstructions.push(`checkNextInternalIntersection(${facetPointName}, ${facetNormalName}, position, direction, theta, facetNormal);`);
         }
 
@@ -235,8 +236,25 @@ class Drawer {
                 Page.Demopage.setErrorMessage(`shader_load_fail`, `Failed to load/build the shader.`);
             }
         });
+    }
 
-        if (!this.raytracedVolumeShader) {
+    private recomputeRaytracedVolumeShader(): void {
+        if (this.gemstone) {
+            const facetsDefinitionInstructions: string[] = [];
+            const computeEntryPointInstructions: string[] = [];
+            const checkIfInsideInstructions: string[] = [];
+            for (let i = 0; i < this.gemstone.facets.length; i++) {
+                const facet = this.gemstone.facets[i];
+                const facetPointName = `FACET_${i}_POINT`;
+                const facetNormalName = `FACET_${i}_NORMAL`;
+
+                facetsDefinitionInstructions.push(`const vec3 ${facetPointName} = vec3(${facet.point.x},${facet.point.y},${facet.point.z});`);
+                facetsDefinitionInstructions.push(`const vec3 ${facetNormalName} = vec3(${facet.normal.x},${facet.normal.y},${facet.normal.z});`);
+
+                computeEntryPointInstructions.push(`computeIntersectionWithPlane(${facetPointName}, ${facetNormalName}, eyePosition, fromEyeNormalized, theta, facetNormal);`);
+                checkIfInsideInstructions.push(`isInside(${facetPointName}, ${facetNormalName}, entryPoint)`);
+            }
+
             ShaderManager.buildShader({
                 fragmentFilename: "raytracedVolume.frag",
                 vertexFilename: "raytracedVolume.vert",
@@ -247,13 +265,10 @@ class Drawer {
                 },
             }, (builtShader: Shader | null) => {
                 Page.Canvas.showLoader(false);
-
-                if (!this.raytracedVolumeShader) {
-                    if (builtShader !== null) {
-                        this.raytracedVolumeShader = builtShader;
-                    } else {
-                        Page.Demopage.setErrorMessage(`shader_load_fail`, `Failed to load/build the shader.`);
-                    }
+                if (builtShader !== null) {
+                    this.raytracedVolumeShader = builtShader;
+                } else {
+                    Page.Demopage.setErrorMessage(`shader_load_fail`, `Failed to load/build the shader.`);
                 }
             });
         }

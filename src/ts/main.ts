@@ -28,8 +28,7 @@ function main(): void {
     }
     Page.Canvas.Observers.canvasResize.push(() => { needToAdjustCanvasSize = true; });
 
-    const gemstone = new Gemstone();
-    const drawer = new Drawer(gl, gemstone);
+    const drawer = new Drawer(gl);
 
     let timeOfLastFPSUpdate = performance.now();
     let framesSinceLastFPSUpdate = 0;
@@ -41,6 +40,10 @@ function main(): void {
 
         Page.Canvas.setIndicatorText("fps-indicator", Math.round(fps).toString());
     }, 500);
+
+    Gemstone.loadGemstone("diamond_brillant_cut.obj", (loadedGemstone: Gemstone) => {
+        drawer.setGemstone(loadedGemstone);
+    });
 
     function mainLoop(): void {
         framesSinceLastFPSUpdate++;

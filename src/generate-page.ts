@@ -124,3 +124,4 @@ const SCRIPT_DECLARATION_FILEPATH = path.join(SRC_DIR, "ts", "page-interface-gen
 fs.writeFileSync(SCRIPT_DECLARATION_FILEPATH, buildResult.pageScriptDeclaration);
 
 fse.copySync(path.join(SRC_DIR, "resources", "script"), path.join(DEST_DIR, "script"));
+fse.copySync(path.join(SRC_DIR, "resources", "models"), path.join(DEST_DIR, "models"));

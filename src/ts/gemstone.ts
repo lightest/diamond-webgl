@@ -1,56 +1,35 @@
 import { averagePoint, computeTriangleNormal, IHalfSpace, IPoint, ITriangle } from "./geometry";
 
+const knownGemstones: {
+    [name: string]: Gemstone | null; // null when requested but not loaded yet
+} = {};
 
 class Gemstone {
-    public facets: IHalfSpace[];
-    public bufferData: Float32Array;
-    public nbTriangles: number;
-
-    public constructor() {
-        this.loadBufferData(
-            `# Blender v2.92.0 OBJ File: ''
-            # www.blender.org
-            mtllib cube.mtl
-            o Cube
-            v 0.400000 0.400000 -0.400000
-            v 0.400000 -0.400000 -0.400000
-            v 0.400000 0.400000 0.400000
-            v 0.400000 -0.400000 0.400000
-            v -0.400000 0.400000 -0.400000
-            v -0.400000 -0.400000 -0.400000
-            v -0.400000 0.400000 0.400000
-            v -0.400000 -0.400000 0.400000
-            vt 0.625000 0.500000
-            vt 0.875000 0.500000
-            vt 0.875000 0.750000
-            vt 0.625000 0.750000
-            vt 0.375000 0.750000
-            vt 0.625000 1.000000
-            vt 0.375000 1.000000
-            vt 0.375000 0.000000
-            vt 0.625000 0.000000
-            vt 0.625000 0.250000
-            vt 0.375000 0.250000
-            vt 0.125000 0.500000
-            vt 0.375000 0.500000
-            vt 0.125000 0.750000
-            vn 0.0000 1.0000 0.0000
-            vn 0.0000 0.0000 1.0000
-            vn -1.0000 0.0000 0.0000
-            vn 0.0000 -1.0000 0.0000
-            vn 1.0000 0.0000 0.0000
-            vn 0.0000 0.0000 -1.0000
-            usemtl Material
-            s off
-            f 1/1/1 5/2/1 7/3/1 3/4/1
-            f 4/5/2 3/4/2 7/6/2 8/7/2
-            f 8/8/3 7/9/3 5/10/3 6/11/3
-            f 6/12/4 2/13/4 4/5/4 8/14/4
-            f 2/13/5 1/1/5 3/4/5 4/5/5
-            f 6/11/6 5/10/6 1/1/6 2/13/6`);
+    public static loadGemstone(name: string, callback: (gemstone: Gemstone | null) => unknown): void {
+        if (typeof knownGemstones[name] !== "undefined") {
+            callback(knownGemstones[name]);
+        } else {
+            const request = new XMLHttpRequest();
+            request.addEventListener("load", () => {
+                if (request.status === 200) {
+                    if (typeof knownGemstones[name] === "undefined") {
+                        knownGemstones[name] = new Gemstone(request.responseText);
+                    }
+                    callback(knownGemstones[name]);
+                } else {
+                    callback(null);
+                }
+            });
+            request.open("GET", `models/${name}`);
+            request.send();
+        }
     }
 
-    private loadBufferData(input: string): void {
+    public readonly facets: IHalfSpace[];
+    public readonly bufferData: Float32Array;
+    public readonly nbTriangles: number;
+
+    private constructor(input: string) {
         const lines = input.split("\n");
 
         const vertices: IPoint[] = [];
