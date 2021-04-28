@@ -43,7 +43,8 @@ float computeInternalIntersection(const vec3 position, const vec3 direction, out
 }
 
 vec3 sampleSkybox(const vec3 direction) {
-    return vec3(1) * (0.5 + 0.5 * (step(0.7, direction.z) * step(direction.z, 0.9)));
+    float lightRing = step(0.7, direction.z) * step(direction.z, 0.9);
+    return mix(vec3(1), vec3(3), lightRing);
 }
 
 /** @param interfaceEtaRatio eta_current / eta_other */
