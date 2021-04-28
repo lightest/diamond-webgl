@@ -65,7 +65,7 @@ float computeFresnelReflection(const vec3 incidentRay, const vec3 surfaceNormal,
 }
 
 vec3 computeDiamondColor(vec3 currentPoint, vec3 currentDirection, vec3 currentFacetNormal) {
-    vec3 cumulatedColor  = vec3(0);
+    vec3 cumulatedColor = vec3(0);
     float rayStrength = 1.0;
     float totalDepthInside = 0.0;
 
@@ -75,7 +75,7 @@ vec3 computeDiamondColor(vec3 currentPoint, vec3 currentDirection, vec3 currentF
         totalDepthInside += theta;
         vec3 refractedRay = refract(currentDirection, currentFacetNormal, uRefractionInfo.x);
         float fresnelReflection = computeFresnelReflection(currentDirection, currentFacetNormal, refractedRay, uRefractionInfo.z, uRefractionInfo.w);
-        cumulatedColor += (1.0 - fresnelReflection) * sampleSkybox(refractedRay) * exp(-uAbsorption * totalDepthInside);
+        cumulatedColor += rayStrength * (1.0 - fresnelReflection) * sampleSkybox(refractedRay) * exp(-uAbsorption * totalDepthInside);
         rayStrength *= fresnelReflection;
 
         currentPoint += theta * currentDirection;
