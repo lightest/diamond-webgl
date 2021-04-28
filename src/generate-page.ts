@@ -32,6 +32,23 @@ const data = {
             title: "Gem",
             controls: [
                 {
+                    type: Demopage.supportedControls.Picker,
+                    title: "Cut",
+                    id: "gem-cut-picker-id",
+                    placeholder: "Custom",
+                    options: [
+                        {
+                            value: "cube.obj",
+                            label: "Cube",
+                            checked: true,
+                        },
+                        {
+                            value: "diamond_brillant_cut.obj",
+                            label: "Brilliant cut"
+                        }
+                    ]
+                },
+                {
                     type: Demopage.supportedControls.Range,
                     title: "Refraction",
                     id: "refraction-range-id",

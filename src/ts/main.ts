@@ -41,9 +41,13 @@ function main(): void {
         Page.Canvas.setIndicatorText("fps-indicator", Math.round(fps).toString());
     }, 500);
 
-    Gemstone.loadGemstone("diamond_brillant_cut.obj", (loadedGemstone: Gemstone) => {
-        drawer.setGemstone(loadedGemstone);
-    });
+    function loadGemstone(): void {
+        Gemstone.loadGemstone(Parameters.cut, (loadedGemstone: Gemstone) => {
+            drawer.setGemstone(loadedGemstone);
+        });
+    }
+    Parameters.addCutChangeObserver(loadGemstone);
+    loadGemstone();
 
     function mainLoop(): void {
         framesSinceLastFPSUpdate++;
