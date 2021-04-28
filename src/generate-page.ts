@@ -43,9 +43,25 @@ const data = {
                             checked: true,
                         },
                         {
-                            value: "diamond_brillant_cut.obj",
+                            value: "brilliant_cut.obj",
                             label: "Brilliant cut"
-                        }
+                        },
+                        {
+                            value: "step_cut.obj",
+                            label: "Step cut"
+                        },
+                        {
+                            value: "brilliant_cut_triangle.obj",
+                            label: "Brilliant cut triangle"
+                        },
+                        {
+                            value: "oval_cut.obj",
+                            label: "Oval"
+                        },
+                        {
+                            value: "sphere.obj",
+                            label: "Sphere"
+                        },
                     ]
                 },
                 {
