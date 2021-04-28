@@ -2,6 +2,7 @@ import "./page-interface-generated";
 
 /* === IDs ============================================================ */
 const controlId = {
+    CUT_PICKER_ID: "gem-cut-picker-id",
     REFRACTION_RANGE_ID: "refraction-range-id",
     GEM_COLOR_PICKER: "gem-color-picker-id",
     GEM_ABSOPTION_RANGE_ID: "absorption-range-id",
@@ -15,6 +16,13 @@ const controlId = {
 };
 
 type Observer = () => unknown;
+
+const cutChangeObservers: Observer[] = [];
+Page.Picker.addObserver(controlId.CUT_PICKER_ID, () => {
+    for (const observer of cutChangeObservers) {
+        observer();
+    }
+});
 
 const recomputeShaderObservers: Observer[] = [];
 function callRecomputeShaderObservers(): void {
@@ -63,6 +71,10 @@ Page.ColorPicker.addObserver(controlId.GEM_COLOR_PICKER, updateGemColor);
 updateGemColor();
 
 abstract class Parameters {
+    public static get cut(): string {
+        return Page.Picker.getValue(controlId.CUT_PICKER_ID);
+    }
+
     public static get refractionIndex(): number {
         return Page.Range.getValue(controlId.REFRACTION_RANGE_ID);
     }
@@ -97,6 +109,10 @@ abstract class Parameters {
 
     public static get verbose(): boolean {
         return Page.Checkbox.isChecked(controlId.VERBOSE);
+    }
+
+    public static addCutChangeObserver(observer: Observer): void {
+        cutChangeObservers.push(observer);
     }
 
     public static addBackgroundColorObserver(observer: Observer): void {
