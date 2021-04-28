@@ -1,5 +1,9 @@
 import { averagePoint, computeTriangleNormal, IPlane, IPoint, isInPlane, ITriangle } from "./geometry";
 
+function logParsingInfo(message: string) {
+    console.log(`OBJ parsing:  ${message}`);
+}
+
 const knownGemstones: {
     [name: string]: Gemstone | null; // null when requested but not loaded yet
 } = {};
@@ -48,7 +52,7 @@ class Gemstone {
                         z: parseFloat(lineItems[3]),
                     });
                 } else {
-                    console.log(`Ignoring line ${i} because it does not have enough items: '${line}'.`);
+                    logParsingInfo(`Ignoring line ${i} because it does not have enough items: '${line}'.`);
                     continue;
                 }
             } else if (command === "f") { // declare face
@@ -63,7 +67,7 @@ class Gemstone {
 
                         for (const indice of indices) {
                             if (indice < 1 || indice >= vertices.length) {
-                                console.log(`Ignoring line ${i} because vertex index ${indice} is out of range: '${line}'.`);
+                                logParsingInfo(`Ignoring line ${i} because vertex index ${indice} is out of range: '${line}'.`);
                                 continue;
                             }
                         }
@@ -75,11 +79,11 @@ class Gemstone {
                         });
                     }
                 } else {
-                    console.log(`Ignoring line ${i} because only triangular faces are supported: '${line}'.`);
+                    logParsingInfo(`Ignoring line ${i} because only triangular faces are supported: '${line}'.`);
                     continue;
                 }
             } else {
-                console.log(`Ignoring line ${i}: '${line}'.`);
+                logParsingInfo(`Ignoring line ${i}: '${line}'.`);
                 continue;
             }
         }
