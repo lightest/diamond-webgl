@@ -104,6 +104,11 @@ const data = {
                     id: "display-indicators-checkbox-id",
                     checked: true,
                 },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Verbose",
+                    id: "verbose-checkbox-id",
+                },
             ]
         }
     ]

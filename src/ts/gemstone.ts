@@ -1,7 +1,10 @@
 import { averagePoint, computeTriangleNormal, IOrientedPlane, IPoint, isInPlane, isInsideVolume, ITriangle } from "./geometry";
+import { Parameters } from "./parameters";
 
-function logParsingInfo(message: string) {
-    console.log(`OBJ parsing:  ${message}`);
+function logParsingInfo(message: string): void {
+    if (Parameters.verbose) {
+        console.log(`OBJ parsing:  ${message}`);
+    }
 }
 
 const knownGemstones: {

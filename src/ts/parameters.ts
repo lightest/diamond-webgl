@@ -11,6 +11,7 @@ const controlId = {
     DISPLAY_INDICATORS: "display-indicators-checkbox-id",
     RAYTRACED_VOLUME: "raytraced-volume-checkbox-id",
     DISPLAY_NORMALS: "display-normals-checkbox-id",
+    VERBOSE: "verbose-checkbox-id",
 };
 
 type Observer = () => unknown;
@@ -92,6 +93,10 @@ abstract class Parameters {
 
     public static get displayNormals(): boolean {
         return Page.Checkbox.isChecked(controlId.DISPLAY_NORMALS);
+    }
+
+    public static get verbose(): boolean {
+        return Page.Checkbox.isChecked(controlId.VERBOSE);
     }
 
     public static addBackgroundColorObserver(observer: Observer): void {
