@@ -10,7 +10,7 @@ interface IVector {
     z: number;
 }
 
-interface IHalfSpace {
+interface IPlane {
     point: IPoint;
     normal: IVector;
 }
@@ -27,6 +27,10 @@ function computeTriangleNormal(triangle: ITriangle): IVector {
     const normal = crossProduct(v12, v13);
     normalize(normal);
     return normal;
+}
+
+function dotProduct(v1: IVector, v2: IVector): number {
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
 function crossProduct(v1: IVector, v2: IVector): IVector {
@@ -72,10 +76,16 @@ function averagePoint(...points: IPoint[]): IPoint {
     return result;
 }
 
+function isInPlane(plane: IPlane, point: IPoint): boolean {
+    const localCoords = substraction(point, plane.point);
+    return Math.abs(dotProduct(plane.normal, localCoords)) < 0.001;
+}
+
 export {
     averagePoint,
     computeTriangleNormal,
-    IHalfSpace,
+    isInPlane,
+    IPlane,
     IPoint,
     IVector,
     ITriangle,

@@ -1,4 +1,4 @@
-import { averagePoint, computeTriangleNormal, IHalfSpace, IPoint, ITriangle } from "./geometry";
+import { averagePoint, computeTriangleNormal, IPlane, IPoint, isInPlane, ITriangle } from "./geometry";
 
 const knownGemstones: {
     [name: string]: Gemstone | null; // null when requested but not loaded yet
@@ -25,7 +25,7 @@ class Gemstone {
         }
     }
 
-    public readonly facets: IHalfSpace[];
+    public readonly facets: IPlane[];
     public readonly bufferData: Float32Array;
     public readonly nbTriangles: number;
 
@@ -118,13 +118,24 @@ class Gemstone {
         return bufferData;
     }
 
-    private static buildFacetsFromTriangles(triangles: ITriangle[]): IHalfSpace[] {
-        const result: IHalfSpace[] = [];
+    private static buildFacetsFromTriangles(triangles: ITriangle[]): IPlane[] {
+        const result: IPlane[] = [];
         for (const triangle of triangles) {
-            result.push({
-                point: averagePoint(triangle.p1, triangle.p2, triangle.p3),
-                normal: computeTriangleNormal(triangle),
-            });
+            let knownFacet = false;
+
+            for (const registeredPlane of result) {
+                if (isInPlane(registeredPlane, triangle.p1) && isInPlane(registeredPlane, triangle.p2) && isInPlane(registeredPlane, triangle.p3)) {
+                    knownFacet = true;
+                    break;
+                }
+            }
+
+            if (!knownFacet) {
+                result.push({
+                    point: averagePoint(triangle.p1, triangle.p2, triangle.p3),
+                    normal: computeTriangleNormal(triangle),
+                });
+            }
         }
         return result;
     }
