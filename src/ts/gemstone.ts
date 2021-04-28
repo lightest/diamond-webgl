@@ -1,4 +1,4 @@
-import { averagePoint, computeTriangleNormal, IPlane, IPoint, isInPlane, ITriangle } from "./geometry";
+import { averagePoint, computeTriangleNormal, IOrientedPlane, IPoint, isInPlane, isInsideVolume, ITriangle } from "./geometry";
 
 function logParsingInfo(message: string) {
     console.log(`OBJ parsing:  ${message}`);
@@ -29,9 +29,10 @@ class Gemstone {
         }
     }
 
-    public readonly facets: IPlane[];
+    public readonly facets: IOrientedPlane[];
     public readonly bufferData: Float32Array;
     public readonly nbTriangles: number;
+    public readonly isConvex: boolean;
 
     private constructor(input: string) {
         const lines = input.split("\n");
@@ -91,6 +92,11 @@ class Gemstone {
         this.nbTriangles = triangles.length;
         this.bufferData = Gemstone.buildBufferFromTriangles(triangles);
         this.facets = Gemstone.buildFacetsFromTriangles(triangles);
+        this.isConvex = Gemstone.checkConvexity(vertices, this.facets);
+
+        if (!this.isConvex) {
+            console.log("not convex :(");
+        }
     }
 
     private static buildBufferFromTriangles(triangles: ITriangle[]): Float32Array {
@@ -122,8 +128,8 @@ class Gemstone {
         return bufferData;
     }
 
-    private static buildFacetsFromTriangles(triangles: ITriangle[]): IPlane[] {
-        const result: IPlane[] = [];
+    private static buildFacetsFromTriangles(triangles: ITriangle[]): IOrientedPlane[] {
+        const result: IOrientedPlane[] = [];
         for (const triangle of triangles) {
             let knownFacet = false;
 
@@ -142,6 +148,15 @@ class Gemstone {
             }
         }
         return result;
+    }
+
+    private static checkConvexity(vertices: IPoint[], facets: IOrientedPlane[]): boolean {
+        for (const vertice of vertices) {
+            if (!isInsideVolume(facets, vertice)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 

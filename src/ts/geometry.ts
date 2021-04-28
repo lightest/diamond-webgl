@@ -10,7 +10,7 @@ interface IVector {
     z: number;
 }
 
-interface IPlane {
+interface IOrientedPlane {
     point: IPoint;
     normal: IVector;
 }
@@ -76,16 +76,27 @@ function averagePoint(...points: IPoint[]): IPoint {
     return result;
 }
 
-function isInPlane(plane: IPlane, point: IPoint): boolean {
+function isInPlane(plane: IOrientedPlane, point: IPoint): boolean {
     const localCoords = substraction(point, plane.point);
     return Math.abs(dotProduct(plane.normal, localCoords)) < 0.001;
+}
+
+function isInsideVolume(planes: IOrientedPlane[], point: IPoint): boolean {
+    for (const plane of planes) {
+        const localCoords = substraction(point, plane.point);
+        if (dotProduct(plane.normal, localCoords) > 0.001) {
+            return false;
+        }
+    }
+    return true;
 }
 
 export {
     averagePoint,
     computeTriangleNormal,
     isInPlane,
-    IPlane,
+    isInsideVolume,
+    IOrientedPlane,
     IPoint,
     IVector,
     ITriangle,
