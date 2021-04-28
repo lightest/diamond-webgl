@@ -86,7 +86,7 @@ class Drawer {
         this.camera.phi = 1.1;
         this.camera.theta = 2;
 
-        const EPSILON = 0.2;
+        const EPSILON = 0.002;
         const minPhi = EPSILON;
         const maxPhi = Math.PI - EPSILON;
         Page.Canvas.Observers.mouseDrag.push((dX: number, dY: number) => {
