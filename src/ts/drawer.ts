@@ -202,40 +202,42 @@ class Drawer {
     }
 
     private recomputeShader(): void {
-        const facetsDefinitionInstructions: string[] = [];
-        const computeInternalIntersectionInstructions: string[] = [];
-        for (let i = 0; i < this.gemstone.facets.length; i++) {
-            const facet = this.gemstone.facets[i];
-            const facetPointName = `FACET_${i}_POINT`;
-            const facetNormalName = `FACET_${i}_NORMAL`;
+        if (this.gemstone) {
+            const facetsDefinitionInstructions: string[] = [];
+            const computeInternalIntersectionInstructions: string[] = [];
+            for (let i = 0; i < this.gemstone.facets.length; i++) {
+                const facet = this.gemstone.facets[i];
+                const facetPointName = `FACET_${i}_POINT`;
+                const facetNormalName = `FACET_${i}_NORMAL`;
 
-            facetsDefinitionInstructions.push(`const vec3 ${facetPointName} = vec3(${facet.point.x},${facet.point.y},${facet.point.z});`);
-            facetsDefinitionInstructions.push(`const vec3 ${facetNormalName} = vec3(${facet.normal.x},${facet.normal.y},${facet.normal.z});`);
+                facetsDefinitionInstructions.push(`const vec3 ${facetPointName} = vec3(${facet.point.x},${facet.point.y},${facet.point.z});`);
+                facetsDefinitionInstructions.push(`const vec3 ${facetNormalName} = vec3(${facet.normal.x},${facet.normal.y},${facet.normal.z});`);
 
-            computeInternalIntersectionInstructions.push(`checkNextInternalIntersection(${facetPointName}, ${facetNormalName}, position, direction, theta, facetNormal);`);
+                computeInternalIntersectionInstructions.push(`checkNextInternalIntersection(${facetPointName}, ${facetNormalName}, position, direction, theta, facetNormal);`);
+            }
+
+            ShaderManager.buildShader({
+                fragmentFilename: "shader.frag",
+                vertexFilename: "shader.vert",
+                injected: {
+                    FACETS_DEFINITION: facetsDefinitionInstructions.join("\n"),
+                    COMPUTE_INTERNAL_INTERSECTION: computeInternalIntersectionInstructions.join("\n\t"),
+                    RAY_DEPTH: Parameters.rayDepth.toString(),
+                },
+            }, (builtShader: Shader | null) => {
+                Page.Canvas.showLoader(false);
+                if (this.shader) {
+                    this.shader.freeGLResources();
+                    this.shader = undefined;
+                }
+
+                if (builtShader !== null) {
+                    this.shader = builtShader;
+                } else {
+                    Page.Demopage.setErrorMessage(`shader_load_fail`, `Failed to load/build the shader.`);
+                }
+            });
         }
-
-        ShaderManager.buildShader({
-            fragmentFilename: "shader.frag",
-            vertexFilename: "shader.vert",
-            injected: {
-                FACETS_DEFINITION: facetsDefinitionInstructions.join("\n"),
-                COMPUTE_INTERNAL_INTERSECTION: computeInternalIntersectionInstructions.join("\n\t"),
-                RAY_DEPTH: Parameters.rayDepth.toString(),
-            },
-        }, (builtShader: Shader | null) => {
-            Page.Canvas.showLoader(false);
-            if (this.shader) {
-                this.shader.freeGLResources();
-                this.shader = undefined;
-            }
-
-            if (builtShader !== null) {
-                this.shader = builtShader;
-            } else {
-                Page.Demopage.setErrorMessage(`shader_load_fail`, `Failed to load/build the shader.`);
-            }
-        });
     }
 
     private recomputeRaytracedVolumeShader(): void {
@@ -265,6 +267,11 @@ class Drawer {
                 },
             }, (builtShader: Shader | null) => {
                 Page.Canvas.showLoader(false);
+                if (this.raytracedVolumeShader) {
+                    this.raytracedVolumeShader.freeGLResources();
+                    this.raytracedVolumeShader = undefined;
+                }
+
                 if (builtShader !== null) {
                     this.raytracedVolumeShader = builtShader;
                 } else {
