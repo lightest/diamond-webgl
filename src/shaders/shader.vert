@@ -9,5 +9,5 @@ varying vec3 vNormal;
 void main(void) {
     gl_Position = uMVPMatrix * vec4(aPosition, 1.0);
     vPosition = aPosition;
-    vNormal = aNormal;
+    vNormal = normalize(aNormal);
 }
