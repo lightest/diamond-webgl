@@ -6,8 +6,10 @@ const controlId = {
     GEM_COLOR_PICKER: "gem-color-picker-id",
     GEM_ABSOPTION_RANGE_ID: "absorption-range-id",
     RAY_DEPTH_RANGE_ID: "ray-depth-range-id",
+    REFLECTION: "reflection-checkbox-id",
     BACKGROUND_COLOR_PICKER: "background-color-picker-id",
     DISPLAY_INDICATORS: "display-indicators-checkbox-id",
+    RAYTRACED_VOLUME: "raytraced-volume-checkbox-id",
     DISPLAY_NORMALS: "display-normals-checkbox-id",
 };
 
@@ -78,6 +80,14 @@ abstract class Parameters {
 
     public static get rayDepth(): number {
         return Math.ceil(Page.Range.getValue(controlId.RAY_DEPTH_RANGE_ID));
+    }
+
+    public static get displayReflection(): boolean {
+        return Page.Checkbox.isChecked(controlId.REFLECTION);
+    }
+
+    public static get displayRaytracedVolume(): boolean {
+        return Page.Checkbox.isChecked(controlId.RAYTRACED_VOLUME);
     }
 
     public static get displayNormals(): boolean {

@@ -5,9 +5,15 @@ import { Viewport } from "./gl-utils/viewport";
 import { Drawer } from "./drawer";
 import { Gemstone } from "./gemstone";
 
+import { registerPolyfills } from "./utils";
+
 import "./page-interface-generated";
+import { Parameters } from "./parameters";
+
 
 function main(): void {
+    registerPolyfills();
+
     if (!GLCanvas.initGL()) {
         return;
     }
@@ -15,7 +21,7 @@ function main(): void {
     let needToAdjustCanvasSize = true;
     function adjustCanvasSize(): void {
         if (needToAdjustCanvasSize) {
-            GLCanvas.adjustSize(false);
+            GLCanvas.adjustSize(true);
             Viewport.setFullCanvas(gl);
             needToAdjustCanvasSize = false;
         }
@@ -40,7 +46,13 @@ function main(): void {
         framesSinceLastFPSUpdate++;
 
         adjustCanvasSize();
-        drawer.draw();
+
+        if (Parameters.displayRaytracedVolume) {
+            drawer.drawDebugVolume();
+        } else {
+            drawer.draw();
+        }
+
         requestAnimationFrame(mainLoop);
     }
     mainLoop();

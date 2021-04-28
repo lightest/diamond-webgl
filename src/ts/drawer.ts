@@ -59,7 +59,7 @@ const REFRACTION_INDEX_AIR = 1.0;
 
 class Drawer {
     private readonly gl: WebGLRenderingContext;
-    private readonly VBO: VBO;
+    private readonly cubeVBO: VBO;
     private readonly pMatrix: number[];
     private readonly mvpMatrix: number[];
 
@@ -67,11 +67,20 @@ class Drawer {
 
     private shader: Shader;
 
+    private geometryVBO: WebGLBuffer;
+    private nbTriangles: number;
+    private raytracedVolumeShader: Shader;
+
     public constructor(gl: WebGLRenderingContext, gemstone: Gemstone) {
         Page.Canvas.showLoader(true);
 
         this.gl = gl;
-        this.VBO = new VBO(gl, UNIT_CUBE, 3, gl.FLOAT, true);
+        this.cubeVBO = new VBO(gl, UNIT_CUBE, 3, gl.FLOAT, true);
+
+        this.geometryVBO = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.geometryVBO);
+        gl.bufferData(gl.ARRAY_BUFFER, gemstone.bufferData, gl.STATIC_DRAW);
+        this.nbTriangles = gemstone.nbTriangles;
 
         this.pMatrix = mat4.create();
         this.mvpMatrix = mat4.create();
@@ -105,8 +114,8 @@ class Drawer {
 
         gl.enable(gl.CULL_FACE);
         gl.frontFace(gl.CCW);
-        gl.cullFace(gl.FRONT);
-        gl.disable(gl.DEPTH_TEST);
+        gl.cullFace(gl.BACK);
+        gl.enable(gl.DEPTH_TEST);
         gl.disable(gl.BLEND);
 
         function updateBackgroundColor(): void {
@@ -133,7 +142,6 @@ class Drawer {
             const gemAbsorption = Parameters.absorption;
             const refractionIndexGem = Parameters.refractionIndex;
 
-            this.shader.a["aPosition"].VBO = this.VBO;
             this.shader.u["uMVPMatrix"].value = this.mvpMatrix;
             this.shader.u["uEyePosition"].value = this.camera.eyePos;
             this.shader.u["uAbsorption"].value = [
@@ -148,9 +156,37 @@ class Drawer {
                 REFRACTION_INDEX_AIR / refractionIndexGem,
                 (REFRACTION_INDEX_AIR / refractionIndexGem < 1) ? Math.cos(Math.asin(REFRACTION_INDEX_AIR / refractionIndexGem)) : -1,
             ];
-
+            this.shader.u["uDisplayReflection"].value = Parameters.displayReflection ? 1 : 0;
             this.shader.use();
+
+
+            const BYTES_PER_FLOAT = 4;
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.geometryVBO);
+            const aPositionLoc = this.shader.a["aPosition"].loc;
+            this.gl.enableVertexAttribArray(aPositionLoc);
+            this.gl.vertexAttribPointer(aPositionLoc, 3, this.gl.FLOAT, false, 2 * 3 * BYTES_PER_FLOAT, 0);
+
+            const aNormalLoc = this.shader.a["aNormal"].loc;
+            this.gl.enableVertexAttribArray(aNormalLoc);
+            this.gl.vertexAttribPointer(aNormalLoc, 3, this.gl.FLOAT, false, 2 * 3 * BYTES_PER_FLOAT, 3 * BYTES_PER_FLOAT);
+
             this.shader.bindUniformsAndAttributes();
+            this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 * this.nbTriangles);
+        }
+    }
+
+    public drawDebugVolume(): void {
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+        if (this.raytracedVolumeShader) {
+            Page.Canvas.showLoader(false);
+
+            this.raytracedVolumeShader.a["aPosition"].VBO = this.cubeVBO;
+            this.raytracedVolumeShader.u["uMVPMatrix"].value = this.mvpMatrix;
+            this.raytracedVolumeShader.u["uEyePosition"].value = this.camera.eyePos;
+
+            this.raytracedVolumeShader.use();
+            this.raytracedVolumeShader.bindUniformsAndAttributes();
             this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 * 2 * 6);
         }
     }
@@ -183,8 +219,6 @@ class Drawer {
             vertexFilename: "shader.vert",
             injected: {
                 FACETS_DEFINITION: facetsDefinitionInstructions.join("\n"),
-                COMPUTE_ENTRY_POINT: computeEntryPointInstructions.join("\n\t"),
-                CHECK_IF_INSIDE: checkIfInsideInstructions.join(" && "),
                 COMPUTE_INTERNAL_INTERSECTION: computeInternalIntersectionInstructions.join("\n\t"),
                 RAY_DEPTH: Parameters.rayDepth.toString(),
             },
@@ -201,8 +235,29 @@ class Drawer {
                 Page.Demopage.setErrorMessage(`shader_load_fail`, `Failed to load/build the shader.`);
             }
         });
+
+        if (!this.raytracedVolumeShader) {
+            ShaderManager.buildShader({
+                fragmentFilename: "raytracedVolume.frag",
+                vertexFilename: "raytracedVolume.vert",
+                injected: {
+                    FACETS_DEFINITION: facetsDefinitionInstructions.join("\n"),
+                    COMPUTE_ENTRY_POINT: computeEntryPointInstructions.join("\n\t"),
+                    CHECK_IF_INSIDE: checkIfInsideInstructions.join(" && "),
+                },
+            }, (builtShader: Shader | null) => {
+                Page.Canvas.showLoader(false);
+
+                if (!this.raytracedVolumeShader) {
+                    if (builtShader !== null) {
+                        this.raytracedVolumeShader = builtShader;
+                    } else {
+                        Page.Demopage.setErrorMessage(`shader_load_fail`, `Failed to load/build the shader.`);
+                    }
+                }
+            });
+        }
     }
 }
 
 export { Drawer };
-

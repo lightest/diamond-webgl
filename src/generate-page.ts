@@ -64,6 +64,12 @@ const data = {
                     value: 5,
                     step: 1
                 },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Reflection",
+                    id: "reflection-checkbox-id",
+                    checked: true,
+                },
             ],
         },
         {
@@ -80,6 +86,12 @@ const data = {
         {
             title: "Debug",
             controls: [
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Raytraced volume",
+                    id: "raytraced-volume-checkbox-id",
+                    checked: false,
+                },
                 {
                     type: Demopage.supportedControls.Checkbox,
                     title: "Display normals",
