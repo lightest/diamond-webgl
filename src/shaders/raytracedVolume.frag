@@ -8,8 +8,6 @@ uniform vec3 uEyePosition;
 
 varying vec3 vPosition; // in [-0.5,+0.5]^3
 
-#define MAX 0.49
-
 #INJECT(FACETS_DEFINITION)
 
 void computeIntersectionWithPlane(const vec3 planePoint, const vec3 planeNormal, const vec3 startingPoint, const vec3 startingDirection, inout float currentTheta, inout vec3 currentNormal) {
@@ -18,11 +16,8 @@ void computeIntersectionWithPlane(const vec3 planePoint, const vec3 planeNormal,
         float theta = dot(planePoint - startingPoint, planeNormal) / b;
 
         if (theta > 0.0 && currentTheta < theta) {
-            vec3 finalPosition = startingPoint + theta * startingDirection;
-            if (abs(finalPosition.x) < MAX && abs(finalPosition.y) < MAX && abs(finalPosition.z) < MAX) {
-                currentTheta = theta;
-                currentNormal = planeNormal;
-            }
+            currentTheta = theta;
+            currentNormal = planeNormal;
         }
     }
 }
@@ -47,7 +42,7 @@ void computeEntryPoint(const vec3 eyePosition, const vec3 fromEyeNormalized, out
 }
 
 void main(void) {
-    if (abs(vPosition.x) >= MAX && abs(vPosition.y) >= MAX && abs(vPosition.z) >= MAX) {
+    if (abs(vPosition.x) >= 0.49 && abs(vPosition.y) >= 0.49 && abs(vPosition.z) >= 0.49) {
         gl_FragColor = vec4(vec3(1, 0, 0), 1);
         return;
     }
