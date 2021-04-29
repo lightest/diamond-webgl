@@ -149,11 +149,14 @@ class Drawer {
 
             this.shader.u["uMVPMatrix"].value = this.mvpMatrix;
             this.shader.u["uEyePosition"].value = this.camera.eyePos;
-            this.shader.u["uAbsorption"].value = [
-                gemAbsorption * (1 - gemColor.r / 255),
-                gemAbsorption * (1 - gemColor.g / 255),
-                gemAbsorption * (1 - gemColor.b / 255),
-            ];
+            if (this.shader.u["uAbsorption"]) {
+                // when ray depth = 0, this uniform is unused and some drivers delete it, so protect this access
+                this.shader.u["uAbsorption"].value = [
+                    gemAbsorption * (1 - gemColor.r / 255),
+                    gemAbsorption * (1 - gemColor.g / 255),
+                    gemAbsorption * (1 - gemColor.b / 255),
+                ];
+            }
             this.shader.u["uDisplayNormals"].value = Parameters.displayNormals ? 1 : 0;
             this.shader.u["uRefractionInfo"].value = [
                 refractionIndexGem / REFRACTION_INDEX_AIR,
