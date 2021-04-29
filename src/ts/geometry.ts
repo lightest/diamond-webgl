@@ -91,11 +91,31 @@ function isInsideVolume(planes: IOrientedPlane[], point: IPoint): boolean {
     return true;
 }
 
+function rotateZ(point: IPoint, angle: number): IPoint {
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    return {
+        x: cos * point.x - sin * point.y,
+        y: sin * point.x + cos * point.y,
+        z: point.z,
+    };
+}
+
+function cylindric(radius: number, angle: number, z: number): IPoint {
+    return {
+        x: radius * Math.cos(angle),
+        y: radius * Math.sin(angle),
+        z,
+    };
+}
+
 export {
     averagePoint,
     computeTriangleNormal,
+    cylindric,
     isInPlane,
     isInsideVolume,
+    rotateZ,
     IOrientedPlane,
     IPoint,
     IVector,

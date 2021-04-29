@@ -43,6 +43,11 @@ const data = {
                             checked: true,
                         },
                         {
+                            value: "CUSTOM CUT",
+                            label: "Custom cut",
+                            checked: true,
+                        },
+                        {
                             value: "brilliant_cut.obj",
                             label: "Brilliant cut"
                         },
@@ -104,6 +109,66 @@ const data = {
                     checked: true,
                 },
             ],
+        },
+        {
+            title: "Custom cut",
+            id: "custom-cut-section",
+            controls: [
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Pavillion height",
+                    id: "custom-cut-pavillion-height-range-id",
+                    min: 0.1,
+                    max: 0.5,
+                    value: 0.43,
+                    step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Pavillion ratio",
+                    id: "custom-cut-pavillion-ratio-range-id",
+                    min: 0,
+                    max: 1,
+                    value: 0.75,
+                    step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Girdle thickness",
+                    id: "custom-cut-girdle-thickness-range-id",
+                    min: 0,
+                    max: 0.1,
+                    value: 0.02,
+                    step: 0.001
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Crown height",
+                    id: "custom-cut-crown-height-range-id",
+                    min: 0,
+                    max: 0.4,
+                    value: 0.16,
+                    step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Crown table",
+                    id: "custom-cut-crown-table-range-id",
+                    min: 0,
+                    max: 1,
+                    value: 0.53,
+                    step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Crown ratio",
+                    id: "custom-cut-crown-ratio-range-id",
+                    min: 0,
+                    max: 1,
+                    value: 0.5,
+                    step: 0.01
+                }
+            ]
         },
         {
             title: "Display",

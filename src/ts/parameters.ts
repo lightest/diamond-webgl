@@ -9,20 +9,35 @@ const controlId = {
     RAY_DEPTH_RANGE_ID: "ray-depth-range-id",
     REFLECTION: "reflection-checkbox-id",
     BACKGROUND_COLOR_PICKER: "background-color-picker-id",
+
     DISPLAY_INDICATORS: "display-indicators-checkbox-id",
     RAYTRACED_VOLUME: "raytraced-volume-checkbox-id",
     DISPLAY_NORMALS: "display-normals-checkbox-id",
     VERBOSE: "verbose-checkbox-id",
+
+    CUSTOM_CUT_PAVILLION_HEIGHT: "custom-cut-pavillion-height-range-id",
+    CUSTOM_CUT_PAVILLION_RATIO: "custom-cut-pavillion-ratio-range-id",
+    CUSTOM_CUT_GIRDLE_THICKNESS: "custom-cut-girdle-thickness-range-id",
+    CUSTOM_CUT_CROWN_HEIGHT: "custom-cut-crown-height-range-id",
+    CUSTOM_CUT_CROWN_TABLE: "custom-cut-crown-table-range-id",
+    CUSTOM_CUT_CROWN_RATIO: "custom-cut-crown-ratio-range-id",
 };
 
 type Observer = () => unknown;
 
 const cutChangeObservers: Observer[] = [];
-Page.Picker.addObserver(controlId.CUT_PICKER_ID, () => {
+function callCutChangeObservers(): void {
     for (const observer of cutChangeObservers) {
         observer();
     }
-});
+}
+Page.Picker.addObserver(controlId.CUT_PICKER_ID, callCutChangeObservers);
+Page.Range.addLazyObserver(controlId.CUSTOM_CUT_PAVILLION_HEIGHT, callCutChangeObservers);
+Page.Range.addLazyObserver(controlId.CUSTOM_CUT_PAVILLION_RATIO, callCutChangeObservers);
+Page.Range.addLazyObserver(controlId.CUSTOM_CUT_GIRDLE_THICKNESS, callCutChangeObservers);
+Page.Range.addLazyObserver(controlId.CUSTOM_CUT_CROWN_HEIGHT, callCutChangeObservers);
+Page.Range.addLazyObserver(controlId.CUSTOM_CUT_CROWN_TABLE, callCutChangeObservers);
+Page.Range.addLazyObserver(controlId.CUSTOM_CUT_CROWN_RATIO, callCutChangeObservers);
 
 const recomputeShaderObservers: Observer[] = [];
 function callRecomputeShaderObservers(): void {
@@ -111,6 +126,25 @@ abstract class Parameters {
         return Page.Checkbox.isChecked(controlId.VERBOSE);
     }
 
+    public static get customCutPavillionHeight(): number {
+        return Page.Range.getValue(controlId.CUSTOM_CUT_PAVILLION_HEIGHT);
+    }
+    public static get customCutPavillionRati(): number {
+        return Page.Range.getValue(controlId.CUSTOM_CUT_PAVILLION_RATIO);
+    }
+    public static get customCutGirdleThickness(): number {
+        return Page.Range.getValue(controlId.CUSTOM_CUT_GIRDLE_THICKNESS);
+    }
+    public static get customCutCrownHeight(): number {
+        return Page.Range.getValue(controlId.CUSTOM_CUT_CROWN_HEIGHT);
+    }
+    public static get customCutCrownTable(): number {
+        return Page.Range.getValue(controlId.CUSTOM_CUT_CROWN_TABLE);
+    }
+    public static get customCutCrownRatio(): number {
+        return Page.Range.getValue(controlId.CUSTOM_CUT_CROWN_RATIO);
+    }
+
     public static addCutChangeObserver(observer: Observer): void {
         cutChangeObservers.push(observer);
     }
@@ -123,6 +157,12 @@ abstract class Parameters {
         recomputeShaderObservers.push(observer);
     }
 }
+
+function updateCustomCutSection(): void {
+    Page.Sections.setVisibility("custom-cut-section", Parameters.cut === "CUSTOM CUT");
+}
+Parameters.addCutChangeObserver(updateCustomCutSection);
+updateCustomCutSection();
 
 export {
     Parameters,

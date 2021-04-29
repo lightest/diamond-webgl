@@ -1,4 +1,4 @@
-import { averagePoint, computeTriangleNormal, IOrientedPlane, IPoint, isInPlane, isInsideVolume, ITriangle } from "./geometry";
+import { averagePoint, computeTriangleNormal, cylindric, IOrientedPlane, IPoint, isInPlane, isInsideVolume, ITriangle, rotateZ } from "./geometry";
 import { Parameters } from "./parameters";
 
 function logParsingInfo(message: string): void {
@@ -13,14 +13,16 @@ const knownGemstones: {
 
 class Gemstone {
     public static loadGemstone(name: string, callback: (gemstone: Gemstone | null) => unknown): void {
-        if (typeof knownGemstones[name] !== "undefined") {
+        if (name === "CUSTOM CUT") {
+            callback(Gemstone.customCut());
+        } else if (typeof knownGemstones[name] !== "undefined") {
             callback(knownGemstones[name]);
         } else {
             const request = new XMLHttpRequest();
             request.addEventListener("load", () => {
                 if (request.status === 200) {
-                    if (typeof knownGemstones[name] === "undefined") {
-                        knownGemstones[name] = new Gemstone(request.responseText);
+                    if (typeof knownGemstones[name] === "undefined") { // maybe it was loaded in the meantime
+                        knownGemstones[name] = Gemstone.fromObj(request.responseText);
                     }
                     callback(knownGemstones[name]);
                 } else {
@@ -32,12 +34,7 @@ class Gemstone {
         }
     }
 
-    public readonly facets: IOrientedPlane[];
-    public readonly bufferData: Float32Array;
-    public readonly nbTriangles: number;
-    public readonly isConvex: boolean;
-
-    private constructor(input: string) {
+    public static fromObj(input: string): Gemstone {
         const lines = input.split("\n");
 
         const vertices: IPoint[] = [];
@@ -92,11 +89,33 @@ class Gemstone {
             }
         }
 
+        return new Gemstone(triangles);
+    }
+
+    public static customCut(): Gemstone {
+        const triangles = Gemstone.computeBrilliantCut();
+        return new Gemstone(triangles);
+    }
+
+    public readonly facets: IOrientedPlane[];
+    public readonly bufferData: Float32Array;
+    public readonly nbTriangles: number;
+    private readonly isConvex: boolean;
+
+    private constructor(triangles: ITriangle[]) {
         this.nbTriangles = triangles.length;
         this.bufferData = Gemstone.buildBufferFromTriangles(triangles);
         this.facets = Gemstone.buildFacetsFromTriangles(triangles);
+
+        const vertices: IPoint[] = [];
+        for (const triangle of triangles) {
+            vertices.push(triangle.p1);
+            vertices.push(triangle.p2);
+            vertices.push(triangle.p3);
+        }
         this.isConvex = Gemstone.checkConvexity(vertices, this.facets);
 
+        console.log(`triangles: ${triangles.length}  ;  facets: ${this.facets.length}`);
         if (!this.isConvex) {
             console.log("not convex :(");
         }
@@ -160,6 +179,72 @@ class Gemstone {
             }
         }
         return true;
+    }
+
+    private static computeBrilliantCut(): ITriangle[] {
+        const CROWN_SIZE = 1;
+        const HALF_CROWN_SIZE = 0.5 * CROWN_SIZE;
+        const PAVILION_HEIGHT = Parameters.customCutPavillionHeight;
+        const PAVILION_STEP = Parameters.customCutPavillionRati;
+        const GIRDLE_THICKNESS = Parameters.customCutGirdleThickness;
+        const CROWN_DEPTH = Parameters.customCutCrownHeight;
+        const CROWN_RATIO = Parameters.customCutCrownRatio;
+        const TABLE_SIZE = Parameters.customCutCrownTable;
+        const CROWN_HEIGHT = GIRDLE_THICKNESS + CROWN_DEPTH;
+
+        const vertex0: IPoint = { x: 0, y: 0, z: -PAVILION_HEIGHT };
+
+        const vertex1: IPoint = cylindric((1 - PAVILION_STEP) * HALF_CROWN_SIZE / Math.cos(2 * Math.PI / 16), 2 * Math.PI / 8, -PAVILION_HEIGHT * PAVILION_STEP);
+        const vertex2: IPoint = rotateZ(vertex1, -2 * Math.PI / 8);
+        const vertex3: IPoint = cylindric(HALF_CROWN_SIZE, 2 * 2 * Math.PI / 16, 0);
+        const vertex4: IPoint = cylindric(HALF_CROWN_SIZE, 1 * 2 * Math.PI / 16, 0);
+        const vertex5: IPoint = cylindric(HALF_CROWN_SIZE, 0 * 2 * Math.PI / 16, 0);
+
+        const vertex6: IPoint = { x: vertex3.x, y: vertex3.y, z: GIRDLE_THICKNESS };
+        const vertex7: IPoint = { x: vertex4.x, y: vertex4.y, z: GIRDLE_THICKNESS };
+        const vertex8: IPoint = { x: vertex5.x, y: vertex5.y, z: GIRDLE_THICKNESS };
+
+        const vertex9: IPoint = cylindric(0.5 * ((1 - CROWN_RATIO) * CROWN_SIZE + CROWN_RATIO * TABLE_SIZE) / Math.cos(2 * Math.PI / 16), 2 * Math.PI / 8, GIRDLE_THICKNESS + CROWN_RATIO * CROWN_DEPTH);
+        const vertex10: IPoint = rotateZ(vertex9, -2 * Math.PI / 8);
+        const vertex11: IPoint = cylindric(0.5 * TABLE_SIZE, 1 * 2 * Math.PI / 16, CROWN_HEIGHT);
+        const vertex12: IPoint = cylindric(0.5 * TABLE_SIZE, -1 * 2 * Math.PI / 16, CROWN_HEIGHT);
+        const vertex13: IPoint = { x: 0, y: 0, z: CROWN_HEIGHT };
+
+        // compute one eighth
+        const triangles: ITriangle[] = [];
+        // PAVILION
+        triangles.push({ p1: vertex0, p3: vertex2, p2: vertex1 });
+        triangles.push({ p1: vertex1, p3: vertex2, p2: vertex4 });
+        triangles.push({ p1: vertex1, p3: vertex4, p2: vertex3 });
+        triangles.push({ p1: vertex2, p3: vertex5, p2: vertex4 });
+
+        // GIRDLE
+        triangles.push({ p1: vertex3, p3: vertex4, p2: vertex7 });
+        triangles.push({ p1: vertex3, p3: vertex7, p2: vertex6 });
+        triangles.push({ p1: vertex4, p3: vertex5, p2: vertex8 });
+        triangles.push({ p1: vertex4, p3: vertex8, p2: vertex7 });
+
+        // CROWN
+        triangles.push({ p1: vertex11, p3: vertex12, p2: vertex13 });
+        triangles.push({ p1: vertex11, p3: vertex10, p2: vertex12 });
+        triangles.push({ p1: vertex7, p3: vertex8, p2: vertex10 });
+        triangles.push({ p1: vertex7, p3: vertex10, p2: vertex11 });
+        triangles.push({ p1: vertex7, p3: vertex11, p2: vertex9 });
+        triangles.push({ p1: vertex7, p3: vertex9, p2: vertex6 });
+
+        // apply symetry
+        const nbTrianglesForOneEighth = triangles.length;
+        for (let i = 1; i < 8; i++) {
+            for (let iT = 0; iT < nbTrianglesForOneEighth; iT++) {
+                triangles.push({
+                    p1: rotateZ(triangles[iT].p1, i * 2 * Math.PI / 8),
+                    p2: rotateZ(triangles[iT].p2, i * 2 * Math.PI / 8),
+                    p3: rotateZ(triangles[iT].p3, i * 2 * Math.PI / 8),
+                });
+            }
+        }
+
+        return triangles;
     }
 }
 
