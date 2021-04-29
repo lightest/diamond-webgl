@@ -109,8 +109,32 @@ function cylindric(radius: number, angle: number, z: number): IPoint {
     };
 }
 
+function computeIntersection(point: IPoint, direction: IVector, plane: IOrientedPlane): IPoint {
+    const b = dotProduct(direction, plane.normal);
+    if (b !== 0) {
+        const a = dotProduct(substraction(plane.point, point), plane.normal);
+        const theta = a / b;
+        return {
+            x: point.x + theta * direction.x,
+            y: point.y + theta * direction.y,
+            z: point.z + theta * direction.z,
+        };
+    } else {
+        return point;
+    }
+}
+
+function computePlaneFromTriangle(triangle: ITriangle): IOrientedPlane {
+    return {
+        point: averagePoint(triangle.p1, triangle.p2, triangle.p3),
+        normal: computeTriangleNormal(triangle),
+    };
+}
+
 export {
     averagePoint,
+    computeIntersection,
+    computePlaneFromTriangle,
     computeTriangleNormal,
     cylindric,
     isInPlane,

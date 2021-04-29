@@ -1,4 +1,4 @@
-import { averagePoint, computeTriangleNormal, cylindric, IOrientedPlane, IPoint, isInPlane, isInsideVolume, ITriangle, rotateZ } from "./geometry";
+import { computeIntersection, computePlaneFromTriangle, computeTriangleNormal, cylindric, IOrientedPlane, IPoint, isInPlane, isInsideVolume, ITriangle, rotateZ } from "./geometry";
 import { Parameters } from "./parameters";
 
 function logParsingInfo(message: string): void {
@@ -163,10 +163,7 @@ class Gemstone {
             }
 
             if (!knownFacet) {
-                result.push({
-                    point: averagePoint(triangle.p1, triangle.p2, triangle.p3),
-                    normal: computeTriangleNormal(triangle),
-                });
+                result.push(computePlaneFromTriangle(triangle));
             }
         }
         return result;
@@ -210,27 +207,74 @@ class Gemstone {
         const vertex12: IPoint = cylindric(0.5 * TABLE_SIZE, -1 * 2 * Math.PI / 16, CROWN_HEIGHT);
         const vertex13: IPoint = { x: 0, y: 0, z: CROWN_HEIGHT };
 
+        const lowerFacet1 = computePlaneFromTriangle({ p1: vertex2, p3: vertex5, p2: vertex4 });
+        const lowerFacet2 = computePlaneFromTriangle({ p1: vertex1, p3: vertex4, p2: vertex3 });
+
+        const higherFacet1 = computePlaneFromTriangle({ p1: vertex7, p3: vertex8, p2: vertex10 });
+        const higherFacet2 = computePlaneFromTriangle({ p1: vertex6, p3: vertex7, p2: vertex9 });
+
+        const vertex14 = computeIntersection(cylindric(HALF_CROWN_SIZE, 1.75 * 2 * Math.PI / 16, 0), { x: 0, y: 0, z: 1 }, lowerFacet2);
+        const vertex15 = computeIntersection(cylindric(HALF_CROWN_SIZE, 1.50 * 2 * Math.PI / 16, 0), { x: 0, y: 0, z: 1 }, lowerFacet2);
+        const vertex16 = computeIntersection(cylindric(HALF_CROWN_SIZE, 1.25 * 2 * Math.PI / 16, 0), { x: 0, y: 0, z: 1 }, lowerFacet2);
+
+        const vertex17 = computeIntersection(cylindric(HALF_CROWN_SIZE, 0.75 * 2 * Math.PI / 16, 0), { x: 0, y: 0, z: 1 }, lowerFacet1);
+        const vertex18 = computeIntersection(cylindric(HALF_CROWN_SIZE, 0.50 * 2 * Math.PI / 16, 0), { x: 0, y: 0, z: 1 }, lowerFacet1);
+        const vertex19 = computeIntersection(cylindric(HALF_CROWN_SIZE, 0.25 * 2 * Math.PI / 16, 0), { x: 0, y: 0, z: 1 }, lowerFacet1);
+
+        const vertex20 = computeIntersection(cylindric(HALF_CROWN_SIZE, 1.75 * 2 * Math.PI / 16, 0), { x: 0, y: 0, z: 1 }, higherFacet2);
+        const vertex21 = computeIntersection(cylindric(HALF_CROWN_SIZE, 1.50 * 2 * Math.PI / 16, 0), { x: 0, y: 0, z: 1 }, higherFacet2);
+        const vertex22 = computeIntersection(cylindric(HALF_CROWN_SIZE, 1.25 * 2 * Math.PI / 16, 0), { x: 0, y: 0, z: 1 }, higherFacet2);
+
+        const vertex23 = computeIntersection(cylindric(HALF_CROWN_SIZE, 0.75 * 2 * Math.PI / 16, 0), { x: 0, y: 0, z: 1 }, higherFacet1);
+        const vertex24 = computeIntersection(cylindric(HALF_CROWN_SIZE, 0.50 * 2 * Math.PI / 16, 0), { x: 0, y: 0, z: 1 }, higherFacet1);
+        const vertex25 = computeIntersection(cylindric(HALF_CROWN_SIZE, 0.25 * 2 * Math.PI / 16, 0), { x: 0, y: 0, z: 1 }, higherFacet1);
+
         // compute one eighth
         const triangles: ITriangle[] = [];
         // PAVILION
-        triangles.push({ p1: vertex0, p3: vertex2, p2: vertex1 });
-        triangles.push({ p1: vertex1, p3: vertex2, p2: vertex4 });
-        triangles.push({ p1: vertex1, p3: vertex4, p2: vertex3 });
-        triangles.push({ p1: vertex2, p3: vertex5, p2: vertex4 });
+        triangles.push({ p1: vertex0, p3: vertex2, p2: vertex4 });
+        triangles.push({ p1: vertex0, p3: vertex4, p2: vertex1 });
+        triangles.push({ p1: vertex1, p3: vertex4, p2: vertex16 });
+        triangles.push({ p1: vertex1, p3: vertex16, p2: vertex15 });
+        triangles.push({ p1: vertex1, p3: vertex15, p2: vertex14 });
+        triangles.push({ p1: vertex1, p3: vertex14, p2: vertex3 });
+        triangles.push({ p1: vertex2, p3: vertex5, p2: vertex19 });
+        triangles.push({ p1: vertex2, p3: vertex19, p2: vertex18 });
+        triangles.push({ p1: vertex2, p3: vertex18, p2: vertex17 });
+        triangles.push({ p1: vertex2, p3: vertex17, p2: vertex4 });
 
         // GIRDLE
-        triangles.push({ p1: vertex3, p3: vertex4, p2: vertex7 });
-        triangles.push({ p1: vertex3, p3: vertex7, p2: vertex6 });
-        triangles.push({ p1: vertex4, p3: vertex5, p2: vertex8 });
-        triangles.push({ p1: vertex4, p3: vertex8, p2: vertex7 });
+        triangles.push({ p1: vertex19, p3: vertex5, p2: vertex8 });
+        triangles.push({ p1: vertex19, p3: vertex8, p2: vertex25 });
+        triangles.push({ p1: vertex19, p3: vertex25, p2: vertex24 });
+        triangles.push({ p1: vertex19, p3: vertex24, p2: vertex18 });
+        triangles.push({ p1: vertex17, p3: vertex18, p2: vertex24 });
+        triangles.push({ p1: vertex17, p3: vertex24, p2: vertex23 });
+        triangles.push({ p1: vertex17, p3: vertex23, p2: vertex7 });
+        triangles.push({ p1: vertex17, p3: vertex7, p2: vertex4 });
+        triangles.push({ p1: vertex16, p3: vertex4, p2: vertex7 });
+        triangles.push({ p1: vertex16, p3: vertex7, p2: vertex22 });
+        triangles.push({ p1: vertex16, p3: vertex22, p2: vertex21 });
+        triangles.push({ p1: vertex16, p3: vertex21, p2: vertex15 });
+        triangles.push({ p1: vertex14, p3: vertex15, p2: vertex21 });
+        triangles.push({ p1: vertex14, p3: vertex21, p2: vertex20 });
+        triangles.push({ p1: vertex14, p3: vertex20, p2: vertex6 });
+        triangles.push({ p1: vertex14, p3: vertex6, p2: vertex3 });
 
         // CROWN
         triangles.push({ p1: vertex11, p3: vertex12, p2: vertex13 });
         triangles.push({ p1: vertex11, p3: vertex10, p2: vertex12 });
-        triangles.push({ p1: vertex7, p3: vertex8, p2: vertex10 });
         triangles.push({ p1: vertex7, p3: vertex10, p2: vertex11 });
         triangles.push({ p1: vertex7, p3: vertex11, p2: vertex9 });
         triangles.push({ p1: vertex7, p3: vertex9, p2: vertex6 });
+        triangles.push({ p1: vertex10, p3: vertex7, p2: vertex23 });
+        triangles.push({ p1: vertex10, p3: vertex23, p2: vertex24 });
+        triangles.push({ p1: vertex10, p3: vertex24, p2: vertex25 });
+        triangles.push({ p1: vertex10, p3: vertex25, p2: vertex8 });
+        triangles.push({ p1: vertex9, p3: vertex6, p2: vertex20 });
+        triangles.push({ p1: vertex9, p3: vertex20, p2: vertex21 });
+        triangles.push({ p1: vertex9, p3: vertex21, p2: vertex22 });
+        triangles.push({ p1: vertex9, p3: vertex22, p2: vertex7 });
 
         // apply symetry
         const nbTrianglesForOneEighth = triangles.length;
