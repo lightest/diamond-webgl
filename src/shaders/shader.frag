@@ -69,8 +69,8 @@ float computeFresnelReflection(const vec3 incidentRay, const vec3 surfaceNormal,
 }
 
 vec3 computeDiamondColor(vec3 currentPoint, vec3 currentDirection, vec3 currentFacetNormal, const float refractionIndex) {
-    float etaExitingGem = uRefractionIndex;
-    float cosCriticalAngleExitingGem = sqrt(max(0.0, 1.0 - 1.0 / (uRefractionIndex * uRefractionIndex)));
+    float etaExitingGem = refractionIndex;
+    float cosCriticalAngleExitingGem = sqrt(max(0.0, 1.0 - 1.0 / (refractionIndex * refractionIndex)));
 
     vec3 cumulatedColor = vec3(0);
     float rayStrength = 1.0;
