@@ -115,9 +115,8 @@ class Gemstone {
         }
         this.isConvex = Gemstone.checkConvexity(vertices, this.facets);
 
-        console.log(`triangles: ${triangles.length}  ;  facets: ${this.facets.length}`);
         if (!this.isConvex) {
-            console.log("not convex :(");
+            console.log("This shape is not convex :(.");
         }
     }
 

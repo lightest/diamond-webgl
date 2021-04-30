@@ -20,6 +20,14 @@ const data = {
         {
             id: "fps-indicator",
             label: "FPS"
+        },
+        {
+            id: "triangles-count-indicator",
+            label: "Triangles"
+        },
+        {
+            id: "facets-count-indicator",
+            label: "Facets"
         }
     ],
     canvas: {

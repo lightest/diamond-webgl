@@ -135,6 +135,9 @@ class Drawer {
 
         this.recomputeShader();
         this.recomputeRaytracedVolumeShader();
+
+        Page.Canvas.setIndicatorText("triangles-count-indicator", gemstone.nbTriangles.toString());
+        Page.Canvas.setIndicatorText("facets-count-indicator", gemstone.facets.length.toString());
     }
 
     public draw(): void {
