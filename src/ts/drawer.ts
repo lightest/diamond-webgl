@@ -54,9 +54,6 @@ const UNIT_CUBE = new Float32Array([
     +.5, +.5, -.5,
 ]);
 
-
-const REFRACTION_INDEX_AIR = 1.0;
-
 class Drawer {
     private readonly gl: WebGLRenderingContext;
     private readonly cubeVBO: VBO;
@@ -148,7 +145,6 @@ class Drawer {
 
             const gemColor = Parameters.gemColor;
             const gemAbsorption = Parameters.absorption;
-            const refractionIndexGem = Parameters.refractionIndex;
 
             this.shader.u["uMVPMatrix"].value = this.mvpMatrix;
             this.shader.u["uEyePosition"].value = this.camera.eyePos;
@@ -161,12 +157,7 @@ class Drawer {
                 ];
             }
             this.shader.u["uDisplayNormals"].value = Parameters.displayNormals ? 1 : 0;
-            this.shader.u["uRefractionInfo"].value = [
-                refractionIndexGem / REFRACTION_INDEX_AIR,
-                (refractionIndexGem / REFRACTION_INDEX_AIR < 1) ? Math.cos(Math.asin(refractionIndexGem / REFRACTION_INDEX_AIR)) : -1,
-                REFRACTION_INDEX_AIR / refractionIndexGem,
-                (REFRACTION_INDEX_AIR / refractionIndexGem < 1) ? Math.cos(Math.asin(REFRACTION_INDEX_AIR / refractionIndexGem)) : -1,
-            ];
+            this.shader.u["uRefractionIndex"].value = Parameters.refractionIndex;
             this.shader.u["uDisplayReflection"].value = Parameters.displayReflection ? 1 : 0;
             this.shader.u["uASETSkybox"].value = Parameters.asetSkybox ? 1 : 0;
 

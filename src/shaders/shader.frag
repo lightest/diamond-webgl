@@ -9,12 +9,7 @@ uniform vec3 uAbsorption;
 uniform float uDisplayNormals;
 uniform float uDisplayReflection;
 uniform float uASETSkybox;
-
-// x: eta_gem / eta_air
-// y: cos(critical_angle_when_entering_gem)
-// z: eta_air / eta_gem
-// w: cos(critical_angle_when_entering_air)
-uniform vec4 uRefractionInfo;
+uniform float uRefractionIndex;
 
 varying vec3 vPosition;
 varying vec3 vNormal;
@@ -54,8 +49,10 @@ vec3 sampleSkybox(const vec3 direction) {
     return mix(skybox, asetSkybox, uASETSkybox);
 }
 
-/** @param interfaceEtaRatio eta_current / eta_other */
-float computeFresnelReflection(const vec3 incidentRay, const vec3 surfaceNormal, const vec3 refractedRay, const float interfaceEtaRatio, const float cosCriticalAngle) {
+/** @param eta              refraction_index_current / refraction_index_other
+ *  @param surfaceNormal    facing the incidentRay
+ */
+float computeFresnelReflection(const vec3 incidentRay, const vec3 surfaceNormal, const vec3 refractedRay, const float eta, const float cosCriticalAngle) {
     float cosIncident = abs(dot(surfaceNormal, incidentRay));
 
     if (cosIncident < cosCriticalAngle) {
@@ -63,30 +60,33 @@ float computeFresnelReflection(const vec3 incidentRay, const vec3 surfaceNormal,
     }
 
     float cosRefracted = abs(dot(surfaceNormal, refractedRay));
-    float etaCosRefracted = interfaceEtaRatio * cosRefracted;
-    float etaCosIncident = interfaceEtaRatio * cosIncident;
+    float etaCosRefracted = eta * cosRefracted;
+    float etaCosIncident = eta * cosIncident;
 
     float a = (cosIncident - etaCosRefracted) / (cosIncident + etaCosRefracted);
     float b = (etaCosIncident - cosRefracted) / (etaCosIncident + cosRefracted);
     return 0.5 * (a * a + b * b);
 }
 
-vec3 computeDiamondColor(vec3 currentPoint, vec3 currentDirection, vec3 currentFacetNormal) {
+vec3 computeDiamondColor(vec3 currentPoint, vec3 currentDirection, vec3 currentFacetNormal, const float refractionIndex) {
+    float etaExitingGem = uRefractionIndex;
+    float cosCriticalAngleExitingGem = sqrt(max(0.0, 1.0 - 1.0 / (uRefractionIndex * uRefractionIndex)));
+
     vec3 cumulatedColor = vec3(0);
     float rayStrength = 1.0;
     float totalDepthInside = 0.0;
 
     for (int i = 0; i < rayDepth; i++) {
         float theta = computeInternalIntersection(currentPoint, currentDirection, currentFacetNormal);
-
+        vec3 refractedRay = refract(currentDirection, -currentFacetNormal, etaExitingGem);
+        float fresnelReflection = computeFresnelReflection(currentDirection, -currentFacetNormal, refractedRay, etaExitingGem, cosCriticalAngleExitingGem);
+    
         totalDepthInside += theta;
-        vec3 refractedRay = refract(currentDirection, currentFacetNormal, uRefractionInfo.x);
-        float fresnelReflection = computeFresnelReflection(currentDirection, currentFacetNormal, refractedRay, uRefractionInfo.z, uRefractionInfo.w);
         cumulatedColor += rayStrength * (1.0 - fresnelReflection) * sampleSkybox(refractedRay) * exp(-uAbsorption * totalDepthInside);
         rayStrength *= fresnelReflection;
 
         currentPoint += theta * currentDirection;
-        currentDirection = reflect(currentDirection, currentFacetNormal);
+        currentDirection = reflect(currentDirection, -currentFacetNormal);
     }
 
     vec3 lastNormalAsColor = vec3(0.5 + 0.5 * currentFacetNormal);
@@ -96,16 +96,19 @@ vec3 computeDiamondColor(vec3 currentPoint, vec3 currentDirection, vec3 currentF
 void main(void) {
     vec3 fromEyeNormalized = normalize(vPosition - uEyePosition);
 
+    float etaEnteringGem = 1.0 / uRefractionIndex;
+    float cosCriticalAngleEnteringGem = sqrt(max(0.0, 1.0 - uRefractionIndex * uRefractionIndex));
+
     vec3 entryPoint = vPosition;
     vec3 entryFacetNormal = vNormal;
-    vec3 entryDirection = refract(fromEyeNormalized, entryFacetNormal, uRefractionInfo.z);
+    vec3 entryDirection = refract(fromEyeNormalized, entryFacetNormal, etaEnteringGem);
 
-    vec3 diamondColor = computeDiamondColor(entryPoint, entryDirection, entryFacetNormal);
+    vec3 diamondColor = computeDiamondColor(entryPoint, entryDirection, entryFacetNormal, uRefractionIndex);
 
     vec3 reflectedRay = reflect(fromEyeNormalized, entryFacetNormal);
     vec3 reflectedColor = sampleSkybox(reflectedRay);
 
-    float fresnelReflection = uDisplayReflection * computeFresnelReflection(fromEyeNormalized, entryFacetNormal, entryDirection, uRefractionInfo.x, uRefractionInfo.y);
+    float fresnelReflection = uDisplayReflection * computeFresnelReflection(fromEyeNormalized, entryFacetNormal, entryDirection, etaEnteringGem, cosCriticalAngleEnteringGem);
     vec3 finalColor = mix(diamondColor, reflectedColor, fresnelReflection);
     gl_FragColor = vec4(finalColor, 1);
 }
