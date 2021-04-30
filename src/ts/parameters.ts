@@ -14,6 +14,7 @@ const controlId = {
     RAYTRACED_VOLUME: "raytraced-volume-checkbox-id",
     DISPLAY_NORMALS: "display-normals-checkbox-id",
     VERBOSE: "verbose-checkbox-id",
+    ASET_SKYBOX: "aset-skybox-checkbox-id",
 
     CUSTOM_CUT_PAVILLION_HEIGHT: "custom-cut-pavillion-height-range-id",
     CUSTOM_CUT_PAVILLION_RATIO: "custom-cut-pavillion-ratio-range-id",
@@ -124,6 +125,10 @@ abstract class Parameters {
 
     public static get verbose(): boolean {
         return Page.Checkbox.isChecked(controlId.VERBOSE);
+    }
+
+    public static get asetSkybox(): boolean {
+        return Page.Checkbox.isChecked(controlId.ASET_SKYBOX);
     }
 
     public static get customCutPavillionHeight(): number {

@@ -215,6 +215,11 @@ const data = {
                     title: "Verbose",
                     id: "verbose-checkbox-id",
                 },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "ASET skybox",
+                    id: "aset-skybox-checkbox-id",
+                },
             ]
         }
     ]

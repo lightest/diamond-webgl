@@ -168,6 +168,8 @@ class Drawer {
                 (REFRACTION_INDEX_AIR / refractionIndexGem < 1) ? Math.cos(Math.asin(REFRACTION_INDEX_AIR / refractionIndexGem)) : -1,
             ];
             this.shader.u["uDisplayReflection"].value = Parameters.displayReflection ? 1 : 0;
+            this.shader.u["uASETSkybox"].value = Parameters.asetSkybox ? 1 : 0;
+
             this.shader.use();
 
 

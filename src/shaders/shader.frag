@@ -8,6 +8,7 @@ uniform vec3 uEyePosition;
 uniform vec3 uAbsorption;
 uniform float uDisplayNormals;
 uniform float uDisplayReflection;
+uniform float uASETSkybox;
 
 // x: eta_gem / eta_air
 // y: cos(critical_angle_when_entering_gem)
@@ -43,8 +44,14 @@ float computeInternalIntersection(const vec3 position, const vec3 direction, out
 }
 
 vec3 sampleSkybox(const vec3 direction) {
-    float lightRing = step(0.7, direction.z) * step(direction.z, 0.9);
-    return mix(vec3(1), vec3(3), lightRing);
+    vec3 asetSkybox = vec3(
+        step(0.70710678118, direction.z) * step(direction.z, 0.92387953251),
+        step(0.0, direction.z) * step(direction.z, 0.70710678118),
+        step(0.92387953251, direction.z)
+    );
+
+    vec3 skybox = mix(vec3(1), vec3(3), step(0.7, direction.z));
+    return mix(skybox, asetSkybox, uASETSkybox);
 }
 
 /** @param interfaceEtaRatio eta_current / eta_other */
