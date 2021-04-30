@@ -93,7 +93,7 @@ class Drawer {
             this.updateMVPMatrix();
         });
 
-        const minDist = 1.8;
+        const minDist = 0.8;
         const maxDist = 8;
         Page.Canvas.Observers.mouseWheel.push((delta: number) => {
             let d = this.camera.distance + 0.2 * delta;
