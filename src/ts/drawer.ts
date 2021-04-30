@@ -110,7 +110,7 @@ class Drawer {
         gl.enable(gl.CULL_FACE);
         gl.frontFace(gl.CCW);
         gl.cullFace(gl.BACK);
-        gl.enable(gl.DEPTH_TEST);
+        gl.disable(gl.DEPTH_TEST);
         gl.disable(gl.BLEND);
 
         function updateBackgroundColor(): void {
