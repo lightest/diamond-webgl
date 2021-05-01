@@ -13,7 +13,13 @@ import { PostProcessing } from "./post-processing";
 function main(): void {
     registerPolyfills();
 
-    if (!GLCanvas.initGL()) {
+    const webglFlags = {
+        alpha: false,
+        depth: false,
+        stencil: false,
+        preserveDrawingBuffer: false,
+    };
+    if (!GLCanvas.initGL(webglFlags)) {
         return;
     }
 
