@@ -43,12 +43,10 @@ class LazyShader {
         return null;
     }
 
-    public reset(newInjected?: { [key: string]: string }): void {
+    public reset(newInjected: { [key: string]: string }): void {
         this.loadingState = ELoadingState.NOT_LOADED;
 
-        if (newInjected) {
-            this.injected = newInjected;
-        }
+        this.injected = newInjected;
 
         if (this._shader) {
             this._shader.freeGLResources();

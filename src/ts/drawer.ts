@@ -124,7 +124,10 @@ class Drawer {
         Parameters.addBackgroundColorObserver(updateBackgroundColor);
         updateBackgroundColor();
 
-        const recomputeShader = () => { this.shader.reset(); };
+        const recomputeShader = () => {
+            const injectedForGemstone = this.computeInjectedInstructions();
+            this.shader.reset(injectedForGemstone);
+        };
         Parameters.addRecomputeShaderObservers(recomputeShader);
     }
 
