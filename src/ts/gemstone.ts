@@ -104,6 +104,8 @@ class Gemstone {
     private readonly isConvex: boolean;
 
     private constructor(triangles: ITriangle[]) {
+        Gemstone.mutualizeTrianglesVertices(triangles);
+
         this.nbTriangles = triangles.length;
         this.bufferData = Gemstone.buildBufferFromTriangles(triangles);
         this.facets = Gemstone.buildFacetsFromTriangles(triangles);
@@ -120,6 +122,39 @@ class Gemstone {
             console.log("This shape is not convex :(.");
         }
     }
+
+    // private static exportAsObj(triangles: ITriangle[]): string {
+    //     const verticesDeclarations: string[] = [];
+    //     const facesDeclarations: string[] = [];
+
+    //     const verticesOrdered: IPoint[] = [];
+    //     for (const triangle of triangles) {
+    //         let indexOf1 = verticesOrdered.indexOf(triangle.p1);
+    //         let indexOf2 = verticesOrdered.indexOf(triangle.p2);
+    //         let indexOf3 = verticesOrdered.indexOf(triangle.p3);
+
+    //         if (indexOf1 < 0) {
+    //             indexOf1 = verticesOrdered.length;
+    //             verticesOrdered.push(triangle.p1);
+    //         }
+    //         if (indexOf2 < 0) {
+    //             indexOf2 = verticesOrdered.length;
+    //             verticesOrdered.push(triangle.p2);
+    //         }
+    //         if (indexOf3 < 0) {
+    //             indexOf3 = verticesOrdered.length;
+    //             verticesOrdered.push(triangle.p3);
+    //         }
+
+    //         facesDeclarations.push(`f ${indexOf1 + 1} ${indexOf2 + 1} ${indexOf3 + 1}`);
+    //     }
+
+    //     for (const vertice of verticesOrdered) {
+    //         verticesDeclarations.push(`v ${vertice.x} ${vertice.y} ${vertice.z}`);
+    //     }
+
+    //     return `${verticesDeclarations.join("\n")}\n\n${facesDeclarations.join("\n")}`;
+    // }
 
     private static buildBufferFromTriangles(triangles: ITriangle[]): Float32Array {
         const nbFloatsPerTriangle = (3 + 3) * 3;
@@ -267,6 +302,35 @@ class Gemstone {
         }
 
         return triangles;
+    }
+
+    private static mutualizeTrianglesVertices(triangles: ITriangle[]): void {
+        let nbPointsSaved = 0;
+
+        const knownVerticesStore: { [hash: string]: IPoint } = {};
+
+        const precision = Math.pow(10, 8);
+        function round(x: number): number {
+            return Math.round(precision * x);
+        }
+
+        function getSimilarVerticeFromStore(point: IPoint): IPoint {
+            const hash = `${round(point.x)}_${round(point.y)}_${round(point.z)}`;
+            if (typeof knownVerticesStore[hash] === "undefined") {
+                knownVerticesStore[hash] = point;
+            } else {
+                nbPointsSaved++;
+            }
+            return knownVerticesStore[hash];
+        }
+
+        for (const triangle of triangles) {
+            triangle.p1 = getSimilarVerticeFromStore(triangle.p1);
+            triangle.p2 = getSimilarVerticeFromStore(triangle.p2);
+            triangle.p3 = getSimilarVerticeFromStore(triangle.p3);
+        }
+
+        logParsingInfo(`After mutualization: ${Object.keys(knownVerticesStore).length} vertices (saved ${nbPointsSaved} vertices).`);
     }
 }
 
