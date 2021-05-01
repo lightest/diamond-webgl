@@ -202,27 +202,10 @@ class Drawer {
 
     private recomputeShader(): void {
         if (this.gemstone) {
-            const facetsDefinitionInstructions: string[] = [];
-            const computeInternalIntersectionInstructions: string[] = [];
-            for (let i = 0; i < this.gemstone.facets.length; i++) {
-                const facet = this.gemstone.facets[i];
-                const facetPointName = `FACET_${i}_POINT`;
-                const facetNormalName = `FACET_${i}_NORMAL`;
-
-                facetsDefinitionInstructions.push(`const vec3 ${facetPointName} = vec3(${facet.point.x},${facet.point.y},${facet.point.z});`);
-                facetsDefinitionInstructions.push(`const vec3 ${facetNormalName} = vec3(${facet.normal.x},${facet.normal.y},${facet.normal.z});`);
-
-                computeInternalIntersectionInstructions.push(`checkNextInternalIntersection(${facetPointName}, ${facetNormalName}, position, direction, theta, facetNormal);`);
-            }
-
             ShaderManager.buildShader({
                 fragmentFilename: "shader.frag",
                 vertexFilename: "shader.vert",
-                injected: {
-                    FACETS_DEFINITION: facetsDefinitionInstructions.join("\n"),
-                    COMPUTE_INTERNAL_INTERSECTION: computeInternalIntersectionInstructions.join("\n\t"),
-                    RAY_DEPTH: Parameters.rayDepth.toString(),
-                },
+                injected: this.computeInjectedInstructions(),
             }, (builtShader: Shader | null) => {
                 Page.Canvas.showLoader(false);
                 if (this.shader) {
@@ -241,29 +224,10 @@ class Drawer {
 
     private recomputeRaytracedVolumeShader(): void {
         if (this.gemstone) {
-            const facetsDefinitionInstructions: string[] = [];
-            const computeEntryPointInstructions: string[] = [];
-            const checkIfInsideInstructions: string[] = [];
-            for (let i = 0; i < this.gemstone.facets.length; i++) {
-                const facet = this.gemstone.facets[i];
-                const facetPointName = `FACET_${i}_POINT`;
-                const facetNormalName = `FACET_${i}_NORMAL`;
-
-                facetsDefinitionInstructions.push(`const vec3 ${facetPointName} = vec3(${facet.point.x},${facet.point.y},${facet.point.z});`);
-                facetsDefinitionInstructions.push(`const vec3 ${facetNormalName} = vec3(${facet.normal.x},${facet.normal.y},${facet.normal.z});`);
-
-                computeEntryPointInstructions.push(`computeIntersectionWithPlane(${facetPointName}, ${facetNormalName}, eyePosition, fromEyeNormalized, theta, facetNormal);`);
-                checkIfInsideInstructions.push(`isInside(${facetPointName}, ${facetNormalName}, entryPoint)`);
-            }
-
             ShaderManager.buildShader({
                 fragmentFilename: "raytracedVolume.frag",
                 vertexFilename: "raytracedVolume.vert",
-                injected: {
-                    FACETS_DEFINITION: facetsDefinitionInstructions.join("\n"),
-                    COMPUTE_ENTRY_POINT: computeEntryPointInstructions.join("\n\t"),
-                    CHECK_IF_INSIDE: checkIfInsideInstructions.join(" && "),
-                },
+                injected: this.computeInjectedInstructions(),
             }, (builtShader: Shader | null) => {
                 Page.Canvas.showLoader(false);
                 if (this.raytracedVolumeShader) {
@@ -278,6 +242,34 @@ class Drawer {
                 }
             });
         }
+    }
+
+    private computeInjectedInstructions(): { [name: string]: string } {
+        const facetsDefinitionInstructions: string[] = [];
+        const computeEntryPointInstructions: string[] = [];
+        const checkIfInsideInstructions: string[] = [];
+        const computeInternalIntersectionInstructions: string[] = [];
+        for (let i = 0; i < this.gemstone.facets.length; i++) {
+            const facet = this.gemstone.facets[i];
+            const facetPointName = `FACET_${i}_POINT`;
+            const facetNormalName = `FACET_${i}_NORMAL`;
+
+            facetsDefinitionInstructions.push(`const vec3 ${facetPointName} = vec3(${facet.point.x},${facet.point.y},${facet.point.z});`);
+            facetsDefinitionInstructions.push(`const vec3 ${facetNormalName} = vec3(${facet.normal.x},${facet.normal.y},${facet.normal.z});`);
+
+            computeEntryPointInstructions.push(`computeIntersectionWithPlane(${facetPointName}, ${facetNormalName}, eyePosition, fromEyeNormalized, theta, facetNormal);`);
+            checkIfInsideInstructions.push(`isInside(${facetPointName}, ${facetNormalName}, entryPoint)`);
+
+            computeInternalIntersectionInstructions.push(`checkNextInternalIntersection(${facetPointName}, ${facetNormalName}, position, direction, theta, facetNormal);`);
+        }
+
+        return {
+            FACETS_DEFINITION: facetsDefinitionInstructions.join("\n"),
+            COMPUTE_ENTRY_POINT: computeEntryPointInstructions.join("\n\t"),
+            CHECK_IF_INSIDE: checkIfInsideInstructions.join(" && "),
+            COMPUTE_INTERNAL_INTERSECTION: computeInternalIntersectionInstructions.join("\n\t"),
+            RAY_DEPTH: Parameters.rayDepth.toString(),
+        };
     }
 }
 
