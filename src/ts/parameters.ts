@@ -24,6 +24,7 @@ const controlId = {
     CUSTOM_CUT_PAVILLION_HEIGHT: "custom-cut-pavillion-height-range-id",
     CUSTOM_CUT_PAVILLION_RATIO: "custom-cut-pavillion-ratio-range-id",
     CUSTOM_CUT_GIRDLE_THICKNESS: "custom-cut-girdle-thickness-range-id",
+    CUSTOM_CUT_GIRDLE_ROUNDNESS: "custom-cut-girdle-roundness-range-id",
     CUSTOM_CUT_CROWN_HEIGHT: "custom-cut-crown-height-range-id",
     CUSTOM_CUT_CROWN_TABLE: "custom-cut-crown-table-range-id",
     CUSTOM_CUT_CROWN_RATIO: "custom-cut-crown-ratio-range-id",
@@ -51,6 +52,7 @@ Page.Picker.addObserver(controlId.CUT_PICKER_ID, callCutChangeObservers);
 Page.Range.addLazyObserver(controlId.CUSTOM_CUT_PAVILLION_HEIGHT, callCutChangeObservers);
 Page.Range.addLazyObserver(controlId.CUSTOM_CUT_PAVILLION_RATIO, callCutChangeObservers);
 Page.Range.addLazyObserver(controlId.CUSTOM_CUT_GIRDLE_THICKNESS, callCutChangeObservers);
+Page.Range.addLazyObserver(controlId.CUSTOM_CUT_GIRDLE_ROUNDNESS, callCutChangeObservers);
 Page.Range.addLazyObserver(controlId.CUSTOM_CUT_CROWN_HEIGHT, callCutChangeObservers);
 Page.Range.addLazyObserver(controlId.CUSTOM_CUT_CROWN_TABLE, callCutChangeObservers);
 Page.Range.addLazyObserver(controlId.CUSTOM_CUT_CROWN_RATIO, callCutChangeObservers);
@@ -170,6 +172,9 @@ abstract class Parameters {
     }
     public static get customCutGirdleThickness(): number {
         return Page.Range.getValue(controlId.CUSTOM_CUT_GIRDLE_THICKNESS);
+    }
+    public static get customCutGirdleRoundess(): number {
+        return Page.Range.getValue(controlId.CUSTOM_CUT_GIRDLE_ROUNDNESS);
     }
     public static get customCutCrownHeight(): number {
         return Page.Range.getValue(controlId.CUSTOM_CUT_CROWN_HEIGHT);

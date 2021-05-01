@@ -151,6 +151,15 @@ const data = {
                 },
                 {
                     type: Demopage.supportedControls.Range,
+                    title: "Girdle roundness",
+                    id: "custom-cut-girdle-roundness-range-id",
+                    min: 0,
+                    max: 3,
+                    value: 1,
+                    step: 1
+                },
+                {
+                    type: Demopage.supportedControls.Range,
                     title: "Crown height",
                     id: "custom-cut-crown-height-range-id",
                     min: 0,
