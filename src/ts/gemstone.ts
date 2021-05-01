@@ -287,7 +287,6 @@ class Gemstone {
         triangles.push({ p1: vertex11, p3: vertex10, p2: vertex12 });
         triangles.push({ p1: vertex7, p3: vertex10, p2: vertex11 });
         triangles.push({ p1: vertex7, p3: vertex11, p2: vertex9 });
-        triangles.push({ p1: vertex7, p3: vertex9, p2: vertex6 });
 
         // apply symetry
         const nbTrianglesForOneEighth = triangles.length;
