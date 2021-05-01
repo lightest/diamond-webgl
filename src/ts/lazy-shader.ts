@@ -66,7 +66,6 @@ class LazyShader {
         }, (builtShader: Shader | null) => {
             this.loadingState = ELoadingState.LOADED;
 
-            console.log("Built shader " + this.errorMessage);
             if (builtShader !== null) {
                 this._shader = builtShader;
             } else {
