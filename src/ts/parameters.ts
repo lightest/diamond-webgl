@@ -13,8 +13,8 @@ const controlId = {
     BACKGROUND_COLOR_PICKER: "background-color-picker-id",
     HIGH_DPI_CHEKBOX_ID: "high-dpi-checkbox-id",
 
-    LIGHT_TYPE_TABS_ID: "light-type-picker-id",
-    LIGHT_DIRECTION_TABS_ID: "light-direction-picker-id",
+    LIGHT_TYPE_TABS_ID: "light-type-tabs-id",
+    LIGHT_DIRECTION_TABS_ID: "light-direction-tabs-id",
 
     DISPLAY_INDICATORS: "display-indicators-checkbox-id",
     RAYTRACED_VOLUME: "raytraced-volume-checkbox-id",

@@ -210,7 +210,7 @@ const data = {
                 {
                     type: Demopage.supportedControls.Tabs,
                     title: "Type",
-                    id: "light-type-picker-id",
+                    id: "light-type-tabs-id",
                     unique: true,
                     options: [
                         {
@@ -227,7 +227,7 @@ const data = {
                 {
                     type: Demopage.supportedControls.Tabs,
                     title: "From",
-                    id: "light-direction-picker-id",
+                    id: "light-direction-tabs-id",
                     unique: true,
                     options: [
                         {
