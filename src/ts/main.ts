@@ -3,12 +3,10 @@ import { gl } from "./gl-utils/gl-canvas";
 import { Viewport } from "./gl-utils/viewport";
 
 import { Drawer } from "./drawer";
-import { Gemstone } from "./gemstone";
-
-import { registerPolyfills } from "./utils";
-
-import { Parameters } from "./parameters";
 import * as FPSIndicator from "./fps-indicator";
+import { Gemstone } from "./gemstone";
+import { Parameters } from "./parameters";
+import { registerPolyfills } from "./utils";
 
 
 function main(): void {

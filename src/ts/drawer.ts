@@ -1,11 +1,13 @@
-import { Gemstone } from "./gemstone";
 import { Shader } from "./gl-utils/shader";
 import * as ShaderManager from "./gl-utils/shader-manager";
 import { VBO } from "./gl-utils/vbo";
+
+import { Gemstone } from "./gemstone";
 import { OrbitalCamera } from "./orbital-camera";
 import { ELightDirection, ELightType, Parameters } from "./parameters";
 
 import "./page-interface-generated";
+
 
 declare const mat4: any;
 

@@ -1,6 +1,7 @@
 import { computeIntersection, computePlaneFromTriangle, computeTriangleNormal, cylindric, IOrientedPlane, IPoint, isInPlane, isInsideVolume, ITriangle, rotateZ } from "./geometry";
 import { Parameters } from "./parameters";
 
+
 function logParsingInfo(message: string): void {
     if (Parameters.verbose) {
         console.log(`OBJ parsing:  ${message}`);

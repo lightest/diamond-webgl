@@ -1,5 +1,6 @@
 import "./page-interface-generated";
 
+
 let framesSinceLastFPSUpdate = 0;
 let timeOfLastFPSUpdate = performance.now();
 
