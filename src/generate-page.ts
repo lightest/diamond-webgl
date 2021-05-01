@@ -119,45 +119,9 @@ const data = {
             ],
         },
         {
-            title: "Custom cut",
+            title: "Proportions",
             id: "custom-cut-section",
             controls: [
-                {
-                    type: Demopage.supportedControls.Range,
-                    title: "Pavillion height",
-                    id: "custom-cut-pavillion-height-range-id",
-                    min: 0.1,
-                    max: 0.5,
-                    value: 0.43,
-                    step: 0.01
-                },
-                {
-                    type: Demopage.supportedControls.Range,
-                    title: "Pavillion ratio",
-                    id: "custom-cut-pavillion-ratio-range-id",
-                    min: 0,
-                    max: 1,
-                    value: 0.75,
-                    step: 0.01
-                },
-                {
-                    type: Demopage.supportedControls.Range,
-                    title: "Girdle thickness",
-                    id: "custom-cut-girdle-thickness-range-id",
-                    min: 0,
-                    max: 0.1,
-                    value: 0.02,
-                    step: 0.001
-                },
-                {
-                    type: Demopage.supportedControls.Range,
-                    title: "Girdle roundness",
-                    id: "custom-cut-girdle-roundness-range-id",
-                    min: 0,
-                    max: 3,
-                    value: 1,
-                    step: 1
-                },
                 {
                     type: Demopage.supportedControls.Range,
                     title: "Crown height",
@@ -184,7 +148,43 @@ const data = {
                     max: 1,
                     value: 0.5,
                     step: 0.01
-                }
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Girdle thickness",
+                    id: "custom-cut-girdle-thickness-range-id",
+                    min: 0,
+                    max: 0.1,
+                    value: 0.02,
+                    step: 0.001
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Girdle roundness",
+                    id: "custom-cut-girdle-roundness-range-id",
+                    min: 0,
+                    max: 3,
+                    value: 1,
+                    step: 1
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Pavillion height",
+                    id: "custom-cut-pavillion-height-range-id",
+                    min: 0.1,
+                    max: 0.5,
+                    value: 0.43,
+                    step: 0.01
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Pavillion ratio",
+                    id: "custom-cut-pavillion-ratio-range-id",
+                    min: 0,
+                    max: 1,
+                    value: 0.75,
+                    step: 0.01
+                },
             ]
         },
         {

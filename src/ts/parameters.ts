@@ -21,13 +21,13 @@ const controlId = {
     DISPLAY_NORMALS: "display-normals-checkbox-id",
     VERBOSE: "verbose-checkbox-id",
 
-    CUSTOM_CUT_PAVILLION_HEIGHT: "custom-cut-pavillion-height-range-id",
-    CUSTOM_CUT_PAVILLION_RATIO: "custom-cut-pavillion-ratio-range-id",
-    CUSTOM_CUT_GIRDLE_THICKNESS: "custom-cut-girdle-thickness-range-id",
-    CUSTOM_CUT_GIRDLE_ROUNDNESS: "custom-cut-girdle-roundness-range-id",
     CUSTOM_CUT_CROWN_HEIGHT: "custom-cut-crown-height-range-id",
     CUSTOM_CUT_CROWN_TABLE: "custom-cut-crown-table-range-id",
     CUSTOM_CUT_CROWN_RATIO: "custom-cut-crown-ratio-range-id",
+    CUSTOM_CUT_GIRDLE_THICKNESS: "custom-cut-girdle-thickness-range-id",
+    CUSTOM_CUT_GIRDLE_ROUNDNESS: "custom-cut-girdle-roundness-range-id",
+    CUSTOM_CUT_PAVILLION_HEIGHT: "custom-cut-pavillion-height-range-id",
+    CUSTOM_CUT_PAVILLION_RATIO: "custom-cut-pavillion-ratio-range-id",
 };
 
 enum ELightType {
@@ -40,6 +40,11 @@ enum ELightDirection {
     UPWARD = "upward",
 }
 
+interface IRGB {
+    r: number;
+    g: number;
+    b: number;
+}
 type Observer = () => unknown;
 
 function callObservers(observers: Observer[]): void {
@@ -51,13 +56,13 @@ function callObservers(observers: Observer[]): void {
 const cutChangeObservers: Observer[] = [];
 const callCutChangeObservers = () => { callObservers(cutChangeObservers); };
 Page.Picker.addObserver(controlId.CUT_PICKER_ID, callCutChangeObservers);
-Page.Range.addLazyObserver(controlId.CUSTOM_CUT_PAVILLION_HEIGHT, callCutChangeObservers);
-Page.Range.addLazyObserver(controlId.CUSTOM_CUT_PAVILLION_RATIO, callCutChangeObservers);
-Page.Range.addLazyObserver(controlId.CUSTOM_CUT_GIRDLE_THICKNESS, callCutChangeObservers);
-Page.Range.addLazyObserver(controlId.CUSTOM_CUT_GIRDLE_ROUNDNESS, callCutChangeObservers);
 Page.Range.addLazyObserver(controlId.CUSTOM_CUT_CROWN_HEIGHT, callCutChangeObservers);
 Page.Range.addLazyObserver(controlId.CUSTOM_CUT_CROWN_TABLE, callCutChangeObservers);
 Page.Range.addLazyObserver(controlId.CUSTOM_CUT_CROWN_RATIO, callCutChangeObservers);
+Page.Range.addLazyObserver(controlId.CUSTOM_CUT_GIRDLE_THICKNESS, callCutChangeObservers);
+Page.Range.addLazyObserver(controlId.CUSTOM_CUT_GIRDLE_ROUNDNESS, callCutChangeObservers);
+Page.Range.addLazyObserver(controlId.CUSTOM_CUT_PAVILLION_HEIGHT, callCutChangeObservers);
+Page.Range.addLazyObserver(controlId.CUSTOM_CUT_PAVILLION_RATIO, callCutChangeObservers);
 
 const recomputeShaderObservers: Observer[] = [];
 const callRecomputeShaderObservers = () => { callObservers(recomputeShaderObservers); };
@@ -68,12 +73,6 @@ const callCanvasResizeObservers = () => { callObservers(canvasResizeObservers); 
 Page.Canvas.Observers.canvasResize.push(callCanvasResizeObservers);
 Page.Checkbox.addObserver(controlId.HIGH_DPI_CHEKBOX_ID, callCanvasResizeObservers);
 
-
-interface IRGB {
-    r: number;
-    g: number;
-    b: number;
-}
 
 const backgroundColorChangeObservers: Observer[] = [];
 const backgroundColor: IRGB = { r: 0, g: 0, b: 0 };
@@ -150,18 +149,6 @@ abstract class Parameters {
         return Page.Tabs.getValues(controlId.LIGHT_DIRECTION_TABS_ID)[0] as ELightDirection;
     }
 
-    public static get customCutPavillionHeight(): number {
-        return Page.Range.getValue(controlId.CUSTOM_CUT_PAVILLION_HEIGHT);
-    }
-    public static get customCutPavillionRati(): number {
-        return Page.Range.getValue(controlId.CUSTOM_CUT_PAVILLION_RATIO);
-    }
-    public static get customCutGirdleThickness(): number {
-        return Page.Range.getValue(controlId.CUSTOM_CUT_GIRDLE_THICKNESS);
-    }
-    public static get customCutGirdleRoundess(): number {
-        return Page.Range.getValue(controlId.CUSTOM_CUT_GIRDLE_ROUNDNESS);
-    }
     public static get customCutCrownHeight(): number {
         return Page.Range.getValue(controlId.CUSTOM_CUT_CROWN_HEIGHT);
     }
@@ -170,6 +157,18 @@ abstract class Parameters {
     }
     public static get customCutCrownRatio(): number {
         return Page.Range.getValue(controlId.CUSTOM_CUT_CROWN_RATIO);
+    }
+    public static get customCutGirdleThickness(): number {
+        return Page.Range.getValue(controlId.CUSTOM_CUT_GIRDLE_THICKNESS);
+    }
+    public static get customCutGirdleRoundess(): number {
+        return Page.Range.getValue(controlId.CUSTOM_CUT_GIRDLE_ROUNDNESS);
+    }
+    public static get customCutPavillionHeight(): number {
+        return Page.Range.getValue(controlId.CUSTOM_CUT_PAVILLION_HEIGHT);
+    }
+    public static get customCutPavillionRati(): number {
+        return Page.Range.getValue(controlId.CUSTOM_CUT_PAVILLION_RATIO);
     }
 
     public static addCutChangeObserver(observer: Observer): void {
