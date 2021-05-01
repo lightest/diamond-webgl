@@ -21,7 +21,7 @@ function main(): void {
     let needToAdjustCanvasSize = true;
     function adjustCanvasSize(): void {
         if (needToAdjustCanvasSize) {
-            GLCanvas.adjustSize(true);
+            GLCanvas.adjustSize(false);
             Viewport.setFullCanvas(gl);
             needToAdjustCanvasSize = false;
         }

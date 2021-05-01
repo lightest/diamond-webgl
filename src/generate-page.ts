@@ -190,6 +190,45 @@ const data = {
             ]
         },
         {
+            title: "Lighting",
+            controls: [
+                {
+                    type: Demopage.supportedControls.Tabs,
+                    title: "Type",
+                    id: "light-type-picker-id",
+                    unique: true,
+                    options: [
+                        {
+                            value: "white",
+                            label: "White",
+                            checked: true,
+                        },
+                        {
+                            value: "aset",
+                            label: "ASET"
+                        },
+                    ]
+                },
+                {
+                    type: Demopage.supportedControls.Tabs,
+                    title: "From",
+                    id: "light-direction-picker-id",
+                    unique: true,
+                    options: [
+                        {
+                            value: "downward",
+                            label: "Top",
+                            checked: true,
+                        },
+                        {
+                            value: "upward",
+                            label: "Bottom"
+                        },
+                    ]
+                }
+            ]
+        },
+        {
             title: "Debug",
             controls: [
                 {
@@ -214,11 +253,6 @@ const data = {
                     type: Demopage.supportedControls.Checkbox,
                     title: "Verbose",
                     id: "verbose-checkbox-id",
-                },
-                {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "ASET skybox",
-                    id: "aset-skybox-checkbox-id",
                 },
             ]
         }

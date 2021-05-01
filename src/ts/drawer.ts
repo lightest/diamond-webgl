@@ -3,7 +3,7 @@ import { Shader } from "./gl-utils/shader";
 import * as ShaderManager from "./gl-utils/shader-manager";
 import { VBO } from "./gl-utils/vbo";
 import { OrbitalCamera } from "./orbital-camera";
-import { Parameters } from "./parameters";
+import { ELightDirection, ELightType, Parameters } from "./parameters";
 
 import "./page-interface-generated";
 
@@ -162,7 +162,8 @@ class Drawer {
             this.shader.u["uDisplayNormals"].value = Parameters.displayNormals ? 1 : 0;
             this.shader.u["uRefractionIndex"].value = Parameters.refractionIndex;
             this.shader.u["uDisplayReflection"].value = Parameters.displayReflection ? 1 : 0;
-            this.shader.u["uASETSkybox"].value = Parameters.asetSkybox ? 1 : 0;
+            this.shader.u["uASETSkybox"].value = (Parameters.lightType === ELightType.ASET) ? 1 : 0;
+            this.shader.u["uLightDirection"].value = (Parameters.lightDirection === ELightDirection.DOWNWARD) ? 1 : -1;
 
             this.shader.use();
 

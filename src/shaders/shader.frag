@@ -9,6 +9,7 @@ uniform vec3 uAbsorption;
 uniform float uDisplayNormals;
 uniform float uDisplayReflection;
 uniform float uASETSkybox;
+uniform float uLightDirection; // 1 or -1
 uniform float uRefractionIndex;
 
 varying vec3 vPosition;
@@ -38,13 +39,15 @@ float computeInternalIntersection(const vec3 position, const vec3 direction, ino
 }
 
 vec3 sampleSkybox(const vec3 direction) {
-    vec3 asetSkybox = vec3(
-        step(0.70710678118, direction.z) * step(direction.z, 0.92387953251),
-        step(0.0, direction.z) * step(direction.z, 0.70710678118),
-        step(0.92387953251, direction.z)
-    );
+    float z = uLightDirection * direction.z;
 
-    vec3 skybox = mix(vec3(1), vec3(3), step(0.7, direction.z));
+    vec3 asetSkybox = vec3(
+        step(0.2, z) * step(z, 0.96),
+        step(0.0, z) * step(z, 0.2),
+        step(0.96, z)
+    );
+    vec3 skybox = 0.8 * mix(vec3(0.3), vec3(2), step(0.4, z) * step(z, 0.95));
+
     return mix(skybox, asetSkybox, uASETSkybox);
 }
 

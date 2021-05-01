@@ -10,11 +10,13 @@ const controlId = {
     REFLECTION: "reflection-checkbox-id",
     BACKGROUND_COLOR_PICKER: "background-color-picker-id",
 
+    LIGHT_TYPE_TABS_ID: "light-type-picker-id",
+    LIGHT_DIRECTION_TABS_ID: "light-direction-picker-id",
+
     DISPLAY_INDICATORS: "display-indicators-checkbox-id",
     RAYTRACED_VOLUME: "raytraced-volume-checkbox-id",
     DISPLAY_NORMALS: "display-normals-checkbox-id",
     VERBOSE: "verbose-checkbox-id",
-    ASET_SKYBOX: "aset-skybox-checkbox-id",
 
     CUSTOM_CUT_PAVILLION_HEIGHT: "custom-cut-pavillion-height-range-id",
     CUSTOM_CUT_PAVILLION_RATIO: "custom-cut-pavillion-ratio-range-id",
@@ -23,6 +25,16 @@ const controlId = {
     CUSTOM_CUT_CROWN_TABLE: "custom-cut-crown-table-range-id",
     CUSTOM_CUT_CROWN_RATIO: "custom-cut-crown-ratio-range-id",
 };
+
+enum ELightType {
+    WHITE = "white",
+    ASET = "aset",
+}
+
+enum ELightDirection {
+    DOWNWARD = "downward",
+    UPWARD = "upward",
+}
 
 type Observer = () => unknown;
 
@@ -127,8 +139,11 @@ abstract class Parameters {
         return Page.Checkbox.isChecked(controlId.VERBOSE);
     }
 
-    public static get asetSkybox(): boolean {
-        return Page.Checkbox.isChecked(controlId.ASET_SKYBOX);
+    public static get lightType(): ELightType {
+        return Page.Tabs.getValues(controlId.LIGHT_TYPE_TABS_ID)[0] as ELightType;
+    }
+    public static get lightDirection(): ELightDirection {
+        return Page.Tabs.getValues(controlId.LIGHT_DIRECTION_TABS_ID)[0] as ELightDirection;
     }
 
     public static get customCutPavillionHeight(): number {
@@ -170,5 +185,7 @@ Parameters.addCutChangeObserver(updateCustomCutSection);
 updateCustomCutSection();
 
 export {
+    ELightDirection,
+    ELightType,
     Parameters,
 };
