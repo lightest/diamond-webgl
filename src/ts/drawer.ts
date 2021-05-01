@@ -162,7 +162,8 @@ class Drawer {
             if (shader) {
                 Page.Canvas.showLoader(false);
 
-                const gemColor = Parameters.gemColor;
+                const isASETSkybox = (Parameters.lightType === ELightType.ASET);
+                const gemColor = isASETSkybox ? { r: 250, g: 250, b: 250 } : Parameters.gemColor;
                 const gemAbsorption = Parameters.absorption;
 
                 shader.u["uMVPMatrix"].value = this.mvpMatrix;
@@ -179,7 +180,7 @@ class Drawer {
                 shader.u["uDisplayNormals"].value = Parameters.displayNormals ? 1 : 0;
                 shader.u["uRefractionIndex"].value = Parameters.refractionIndex;
                 shader.u["uDisplayReflection"].value = Parameters.displayReflection ? 1 : 0;
-                shader.u["uASETSkybox"].value = (Parameters.lightType === ELightType.ASET) ? 1 : 0;
+                shader.u["uASETSkybox"].value = isASETSkybox ? 1 : 0;
                 shader.u["uLightDirection"].value = (Parameters.lightDirection === ELightDirection.DOWNWARD) ? 1 : -1;
                 shader.use();
 
