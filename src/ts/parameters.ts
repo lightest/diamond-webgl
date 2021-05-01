@@ -42,12 +42,14 @@ enum ELightDirection {
 
 type Observer = () => unknown;
 
-const cutChangeObservers: Observer[] = [];
-function callCutChangeObservers(): void {
-    for (const observer of cutChangeObservers) {
+function callObservers(observers: Observer[]): void {
+    for (const observer of observers) {
         observer();
     }
 }
+
+const cutChangeObservers: Observer[] = [];
+const callCutChangeObservers = () => { callObservers(cutChangeObservers); };
 Page.Picker.addObserver(controlId.CUT_PICKER_ID, callCutChangeObservers);
 Page.Range.addLazyObserver(controlId.CUSTOM_CUT_PAVILLION_HEIGHT, callCutChangeObservers);
 Page.Range.addLazyObserver(controlId.CUSTOM_CUT_PAVILLION_RATIO, callCutChangeObservers);
@@ -58,28 +60,14 @@ Page.Range.addLazyObserver(controlId.CUSTOM_CUT_CROWN_TABLE, callCutChangeObserv
 Page.Range.addLazyObserver(controlId.CUSTOM_CUT_CROWN_RATIO, callCutChangeObservers);
 
 const recomputeShaderObservers: Observer[] = [];
-function callRecomputeShaderObservers(): void {
-    for (const observer of recomputeShaderObservers) {
-        observer();
-    }
-}
+const callRecomputeShaderObservers = () => { callObservers(recomputeShaderObservers); };
 Page.Range.addLazyObserver(controlId.RAY_DEPTH_RANGE_ID, callRecomputeShaderObservers);
 
 const canvasResizeObservers: Observer[] = [];
-function callCanvasResizeObservers(): void {
-    for (const observer of canvasResizeObservers) {
-        observer();
-    }
-}
+const callCanvasResizeObservers = () => { callObservers(canvasResizeObservers); };
 Page.Canvas.Observers.canvasResize.push(callCanvasResizeObservers);
 Page.Checkbox.addObserver(controlId.HIGH_DPI_CHEKBOX_ID, callCanvasResizeObservers);
 
-function updateIndicatorsVisibility(): void {
-    const visible = Page.Checkbox.isChecked(controlId.DISPLAY_INDICATORS);
-    Page.Canvas.setIndicatorsVisibility(visible);
-}
-updateIndicatorsVisibility();
-Page.Checkbox.addObserver(controlId.DISPLAY_INDICATORS, updateIndicatorsVisibility);
 
 interface IRGB {
     r: number;
@@ -95,9 +83,7 @@ function updateBackgroundColor(): void {
     backgroundColor.g = rgb.g;
     backgroundColor.b = rgb.b;
 
-    for (const observer of backgroundColorChangeObservers) {
-        observer();
-    }
+    callObservers(backgroundColorChangeObservers);
 }
 Page.ColorPicker.addObserver(controlId.BACKGROUND_COLOR_PICKER, updateBackgroundColor);
 updateBackgroundColor();
@@ -210,6 +196,13 @@ Parameters.addCutChangeObserver(updateCustomCutSection);
 updateCustomCutSection();
 
 Page.Controls.setVisibility(controlId.HIGH_DPI_CHEKBOX_ID, window.devicePixelRatio > 1);
+
+function updateIndicatorsVisibility(): void {
+    const visible = Page.Checkbox.isChecked(controlId.DISPLAY_INDICATORS);
+    Page.Canvas.setIndicatorsVisibility(visible);
+}
+updateIndicatorsVisibility();
+Page.Checkbox.addObserver(controlId.DISPLAY_INDICATORS, updateIndicatorsVisibility);
 
 export {
     ELightDirection,
