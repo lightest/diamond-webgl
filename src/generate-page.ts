@@ -127,9 +127,9 @@ const data = {
                     title: "Crown height",
                     id: "custom-cut-crown-height-range-id",
                     min: 0,
-                    max: 0.4,
-                    value: 0.16,
-                    step: 0.01
+                    max: 0.2,
+                    value: 0.152,
+                    step: 0.002
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -137,8 +137,8 @@ const data = {
                     id: "custom-cut-crown-table-range-id",
                     min: 0,
                     max: 1,
-                    value: 0.53,
-                    step: 0.01
+                    value: 0.551,
+                    step: 0.001
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -155,7 +155,7 @@ const data = {
                     id: "custom-cut-girdle-thickness-range-id",
                     min: 0,
                     max: 0.1,
-                    value: 0.02,
+                    value: 0.018,
                     step: 0.001
                 },
                 {
@@ -174,7 +174,7 @@ const data = {
                     min: 0.1,
                     max: 0.5,
                     value: 0.43,
-                    step: 0.01
+                    step: 0.005
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -182,7 +182,7 @@ const data = {
                     id: "custom-cut-pavillion-ratio-range-id",
                     min: 0,
                     max: 1,
-                    value: 0.75,
+                    value: 0.77,
                     step: 0.01
                 },
             ]
