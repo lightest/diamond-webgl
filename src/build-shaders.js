@@ -28,25 +28,37 @@ function resolveIncludes(filepath) {
                 const fullpath = path.join(SRC_DIR, p1);
                 return fs.readFileSync(fullpath).toString();
             });
-        
-            includeDepth++;
-            if (includeDepth === MAX_INCLUDE_DEPTH) {
-                console.error("Error while preprocessing '" + filepath + "': too much #include depth.");
-            }
+
+        includeDepth++;
+        if (includeDepth === MAX_INCLUDE_DEPTH) {
+            console.error("Error while preprocessing '" + filepath + "': too much #include depth.");
+        }
     } while (includesLeft > 0 && includeDepth < MAX_INCLUDE_DEPTH);
 
     return processedStr;
 }
 
 
-fse.ensureDirSync(DST_DIR);
 
-fs.readdirSync(SRC_DIR).forEach(file => {
-    if (!file.startsWith("_")) {
-        const srcFilepath = path.join(SRC_DIR, file);
-        const dstFilepath = path.join(DST_DIR, file);
 
-        const resolvedStr = resolveIncludes(srcFilepath);
-        fs.writeFileSync(dstFilepath, resolvedStr);
-    }
-});
+function scanDirectory(directory /* string */) /* void */ {
+    fse.ensureDirSync(path.join(DST_DIR, directory));
+    
+    const fullDirectory = path.join(SRC_DIR, directory);
+    fs.readdirSync(fullDirectory).forEach(file => {
+        const srcFilepath = path.join(fullDirectory, file);
+
+        if (fs.statSync(srcFilepath).isDirectory()) {
+            scanDirectory(path.join(directory, file));
+        } else {
+            if (!file.startsWith("_")) {
+                const dstFilepath = path.join(DST_DIR, directory, file);
+
+                const resolvedStr = resolveIncludes(srcFilepath);
+                fs.writeFileSync(dstFilepath, resolvedStr);
+            }
+        }
+    });
+}
+
+scanDirectory(".");

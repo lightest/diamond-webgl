@@ -7,6 +7,7 @@ import * as FPSIndicator from "./fps-indicator";
 import { Gemstone } from "./gemstone";
 import { Parameters } from "./parameters";
 import { registerPolyfills } from "./utils";
+import { PostProcessing } from "./post-processing";
 
 
 function main(): void {
@@ -20,6 +21,7 @@ function main(): void {
     Parameters.addCanvasResizeObservers(() => { needToAdjustCanvasSize = true; });
 
     const drawer = new Drawer(gl);
+    const postProcessing = new PostProcessing(gl);
 
     function loadGemstone(): void {
         Gemstone.loadGemstone(Parameters.cut, (loadedGemstone: Gemstone) => {
@@ -41,7 +43,13 @@ function main(): void {
         if (Parameters.displayRaytracedVolume) {
             drawer.drawDebugVolume();
         } else {
-            drawer.draw();
+            if (Parameters.postProcessing && postProcessing.isReady) {
+                postProcessing.prepare();
+                drawer.draw();
+                postProcessing.apply();
+            } else {
+                drawer.draw();
+            }
         }
 
         requestAnimationFrame(mainLoop);

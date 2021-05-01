@@ -124,7 +124,7 @@ class Drawer {
 
         function updateBackgroundColor(): void {
             const backgroundColor = Parameters.backgroundColor;
-            gl.clearColor(backgroundColor.r / 255, backgroundColor.g / 255, backgroundColor.b / 255, 1);
+            gl.clearColor(backgroundColor.r / 255, backgroundColor.g / 255, backgroundColor.b / 255, 0.1);
         }
         Parameters.addBackgroundColorObserver(updateBackgroundColor);
         updateBackgroundColor();

@@ -12,6 +12,7 @@ const controlId = {
 
     BACKGROUND_COLOR_PICKER: "background-color-picker-id",
     PROJECTION_TABS_ID: "projection-tabs-id",
+    POST_PROCESSING_CHECKBOX_ID: "post-processing-checkbox-id",
     HIGH_DPI_CHEKBOX_ID: "high-dpi-checkbox-id",
 
     LIGHT_TYPE_TABS_ID: "light-type-tabs-id",
@@ -150,6 +151,10 @@ abstract class Parameters {
 
     public static get projection(): EProjection {
         return Page.Tabs.getValues(controlId.PROJECTION_TABS_ID)[0] as EProjection;
+    }
+
+    public static get postProcessing(): boolean {
+        return Page.Checkbox.isChecked(controlId.POST_PROCESSING_CHECKBOX_ID);
     }
 
     public static get highDPI(): boolean {
