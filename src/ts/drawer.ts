@@ -206,8 +206,8 @@ class Drawer {
     private recomputeShader(): void {
         if (this.gemstone) {
             ShaderManager.buildShader({
-                fragmentFilename: "shader.frag",
-                vertexFilename: "shader.vert",
+                fragmentFilename: `shader.frag?r=${Math.random()}`,
+                vertexFilename: `shader.vert?r=${Math.random()}`,
                 injected: this.computeInjectedInstructions(),
             }, (builtShader: Shader | null) => {
                 Page.Canvas.showLoader(false);

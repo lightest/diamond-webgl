@@ -18,7 +18,7 @@ const int rayDepth = #INJECT(RAY_DEPTH);
 
 #INJECT(FACETS_DEFINITION)
 
-float checkNextInternalIntersection(const vec3 planePoint, const vec3 planeNormal, const vec3 position, const vec3 direction, out float theta, out vec3 facetNormal) {
+float checkNextInternalIntersection(const vec3 planePoint, const vec3 planeNormal, const vec3 position, const vec3 direction, inout float theta, inout vec3 facetNormal) {
     float localTheta = 100000.0;
     float b = dot(direction, planeNormal);
     if (b > 0.0) {
@@ -32,7 +32,7 @@ float checkNextInternalIntersection(const vec3 planePoint, const vec3 planeNorma
     return theta;
 }
 
-float computeInternalIntersection(const vec3 position, const vec3 direction, out vec3 facetNormal) {
+float computeInternalIntersection(const vec3 position, const vec3 direction, inout vec3 facetNormal) {
     float theta = 100000.0;
     #INJECT(COMPUTE_INTERNAL_INTERSECTION)
     return theta;
