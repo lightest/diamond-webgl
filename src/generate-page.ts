@@ -37,7 +37,7 @@ const data = {
     },
     controlsSections: [
         {
-            title: "Gem",
+            title: "Gemstone",
             controls: [
                 {
                     type: Demopage.supportedControls.Picker,
@@ -45,20 +45,20 @@ const data = {
                     id: "gem-cut-picker-id",
                     placeholder: "Custom",
                     options: [
-                        {
-                            value: "cube.obj",
-                            label: "Cube",
-                            checked: true,
-                        },
+                        // {
+                        //     value: "cube.obj",
+                        //     label: "Cube",
+                        //     checked: true,
+                        // },
                         {
                             value: "CUSTOM CUT",
-                            label: "Custom cut",
+                            label: "Brilliant cut",
                             checked: true,
                         },
-                        {
-                            value: "brilliant_cut.obj",
-                            label: "Brilliant cut"
-                        },
+                        // {
+                        //     value: "brilliant_cut.obj",
+                        //     label: "Brilliant cut"
+                        // },
                         {
                             value: "step_cut.obj",
                             label: "Step cut"
@@ -71,10 +71,10 @@ const data = {
                             value: "oval_cut.obj",
                             label: "Oval"
                         },
-                        {
-                            value: "sphere.obj",
-                            label: "Sphere"
-                        },
+                        // {
+                        //     value: "sphere.obj",
+                        //     label: "Sphere"
+                        // },
                     ]
                 },
                 {
