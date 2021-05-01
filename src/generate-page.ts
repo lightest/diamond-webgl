@@ -179,13 +179,19 @@ const data = {
             ]
         },
         {
-            title: "Display",
+            title: "Rendering",
             controls: [
                 {
                     type: Demopage.supportedControls.ColorPicker,
                     title: "Background",
                     id: "background-color-picker-id",
                     defaultValueHex: "#000000",
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "High DPI",
+                    id: "high-dpi-checkbox-id",
+                    checked: false,
                 },
             ]
         },

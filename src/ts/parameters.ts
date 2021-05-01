@@ -8,7 +8,9 @@ const controlId = {
     GEM_ABSOPTION_RANGE_ID: "absorption-range-id",
     RAY_DEPTH_RANGE_ID: "ray-depth-range-id",
     REFLECTION: "reflection-checkbox-id",
+
     BACKGROUND_COLOR_PICKER: "background-color-picker-id",
+    HIGH_DPI_CHEKBOX_ID: "high-dpi-checkbox-id",
 
     LIGHT_TYPE_TABS_ID: "light-type-picker-id",
     LIGHT_DIRECTION_TABS_ID: "light-direction-picker-id",
@@ -59,6 +61,15 @@ function callRecomputeShaderObservers(): void {
     }
 }
 Page.Range.addLazyObserver(controlId.RAY_DEPTH_RANGE_ID, callRecomputeShaderObservers);
+
+const canvasResizeObservers: Observer[] = [];
+function callCanvasResizeObservers(): void {
+    for (const observer of canvasResizeObservers) {
+        observer();
+    }
+}
+Page.Canvas.Observers.canvasResize.push(callCanvasResizeObservers);
+Page.Checkbox.addObserver(controlId.HIGH_DPI_CHEKBOX_ID, callCanvasResizeObservers);
 
 function updateIndicatorsVisibility(): void {
     const visible = Page.Checkbox.isChecked(controlId.DISPLAY_INDICATORS);
@@ -139,6 +150,10 @@ abstract class Parameters {
         return Page.Checkbox.isChecked(controlId.VERBOSE);
     }
 
+    public static get highDPI(): boolean {
+        return Page.Checkbox.isChecked(controlId.HIGH_DPI_CHEKBOX_ID);
+    }
+
     public static get lightType(): ELightType {
         return Page.Tabs.getValues(controlId.LIGHT_TYPE_TABS_ID)[0] as ELightType;
     }
@@ -176,6 +191,10 @@ abstract class Parameters {
     public static addRecomputeShaderObservers(observer: Observer): void {
         recomputeShaderObservers.push(observer);
     }
+
+    public static addCanvasResizeObservers(observer: Observer): void {
+        canvasResizeObservers.push(observer);
+    }
 }
 
 function updateCustomCutSection(): void {
@@ -183,6 +202,8 @@ function updateCustomCutSection(): void {
 }
 Parameters.addCutChangeObserver(updateCustomCutSection);
 updateCustomCutSection();
+
+Page.Controls.setVisibility(controlId.HIGH_DPI_CHEKBOX_ID, window.devicePixelRatio > 1);
 
 export {
     ELightDirection,

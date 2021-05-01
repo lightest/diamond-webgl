@@ -21,12 +21,12 @@ function main(): void {
     let needToAdjustCanvasSize = true;
     function adjustCanvasSize(): void {
         if (needToAdjustCanvasSize) {
-            GLCanvas.adjustSize(false);
+            GLCanvas.adjustSize(Parameters.highDPI);
             Viewport.setFullCanvas(gl);
             needToAdjustCanvasSize = false;
         }
     }
-    Page.Canvas.Observers.canvasResize.push(() => { needToAdjustCanvasSize = true; });
+    Parameters.addCanvasResizeObservers(() => { needToAdjustCanvasSize = true; });
 
     const drawer = new Drawer(gl);
 
