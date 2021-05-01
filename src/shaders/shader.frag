@@ -43,9 +43,9 @@ vec3 sampleSkybox(const vec3 direction) {
     float z = uLightDirection * direction.z;
 
     vec3 asetSkybox = vec3(
-        step(0.2, z) * step(z, 0.96),
-        step(0.0, z) * step(z, 0.2),
-        step(0.96, z)
+        step(0.70, z) * step(z, 0.98),
+        step(0.0, z) * step(z, 0.70),
+        step(0.98, z)
     );
     vec3 skybox = 0.8 * mix(vec3(0.3), vec3(2), step(0.4, z) * step(z, 0.95));
 
