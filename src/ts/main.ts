@@ -7,8 +7,8 @@ import { Gemstone } from "./gemstone";
 
 import { registerPolyfills } from "./utils";
 
-import "./page-interface-generated";
 import { Parameters } from "./parameters";
+import * as FPSIndicator from "./fps-indicator";
 
 
 function main(): void {
@@ -19,27 +19,9 @@ function main(): void {
     }
 
     let needToAdjustCanvasSize = true;
-    function adjustCanvasSize(): void {
-        if (needToAdjustCanvasSize) {
-            GLCanvas.adjustSize(Parameters.highDPI);
-            Viewport.setFullCanvas(gl);
-            needToAdjustCanvasSize = false;
-        }
-    }
     Parameters.addCanvasResizeObservers(() => { needToAdjustCanvasSize = true; });
 
     const drawer = new Drawer(gl);
-
-    let timeOfLastFPSUpdate = performance.now();
-    let framesSinceLastFPSUpdate = 0;
-    setInterval(() => {
-        const now = performance.now();
-        const fps = 1000 * framesSinceLastFPSUpdate / (now - timeOfLastFPSUpdate);
-        timeOfLastFPSUpdate = now;
-        framesSinceLastFPSUpdate = 0;
-
-        Page.Canvas.setIndicatorText("fps-indicator", Math.round(fps).toString());
-    }, 500);
 
     function loadGemstone(): void {
         Gemstone.loadGemstone(Parameters.cut, (loadedGemstone: Gemstone) => {
@@ -50,9 +32,13 @@ function main(): void {
     loadGemstone();
 
     function mainLoop(): void {
-        framesSinceLastFPSUpdate++;
+        FPSIndicator.registerFrame();
 
-        adjustCanvasSize();
+        if (needToAdjustCanvasSize) {
+            GLCanvas.adjustSize(Parameters.highDPI);
+            Viewport.setFullCanvas(gl);
+            needToAdjustCanvasSize = false;
+        }
 
         if (Parameters.displayRaytracedVolume) {
             drawer.drawDebugVolume();
