@@ -90,7 +90,7 @@ const data = {
                     type: Demopage.supportedControls.ColorPicker,
                     title: "Color",
                     id: "gem-color-picker-id",
-                    defaultValueHex: "#FF0000",
+                    defaultValueHex: "#C2CBDE",
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -107,7 +107,7 @@ const data = {
                     id: "ray-depth-range-id",
                     min: 0,
                     max: 20,
-                    value: 5,
+                    value: 7,
                     step: 1
                 },
                 {
