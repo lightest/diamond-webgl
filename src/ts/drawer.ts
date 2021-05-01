@@ -125,16 +125,18 @@ class Drawer {
     }
 
     public setGemstone(gemstone: Gemstone): void {
-        this.gemstone = gemstone;
+        if (this.gemstone !== gemstone) {
+            this.gemstone = gemstone;
 
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.geometryVBO);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, gemstone.bufferData, this.gl.STATIC_DRAW);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.geometryVBO);
+            this.gl.bufferData(this.gl.ARRAY_BUFFER, gemstone.bufferData, this.gl.STATIC_DRAW);
 
-        this.recomputeShader();
-        this.recomputeRaytracedVolumeShader();
+            this.recomputeShader();
+            this.recomputeRaytracedVolumeShader();
 
-        Page.Canvas.setIndicatorText("triangles-count-indicator", gemstone.nbTriangles.toString());
-        Page.Canvas.setIndicatorText("facets-count-indicator", gemstone.facets.length.toString());
+            Page.Canvas.setIndicatorText("triangles-count-indicator", gemstone.nbTriangles.toString());
+            Page.Canvas.setIndicatorText("facets-count-indicator", gemstone.facets.length.toString());
+        }
     }
 
     public draw(): void {
