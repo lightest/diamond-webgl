@@ -130,6 +130,7 @@ class Drawer {
 
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.geometryVBO);
             this.gl.bufferData(this.gl.ARRAY_BUFFER, gemstone.bufferData, this.gl.STATIC_DRAW);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
 
             this.recomputeShader();
             this.recomputeRaytracedVolumeShader();
