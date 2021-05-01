@@ -5,6 +5,7 @@ precision mediump float;
 #endif
 
 uniform vec3 uEyePosition;
+uniform float uOrthographic;
 
 varying vec3 vPosition;
 
@@ -37,7 +38,7 @@ bool computeEntryPoint(const vec3 eyePosition, const vec3 fromEyeNormalized, out
 }
 
 void main(void) {
-    vec3 fromEyeNormalized = normalize(vPosition - uEyePosition);
+    vec3 fromEyeNormalized = normalize(mix(vPosition - uEyePosition, -uEyePosition, uOrthographic));
 
     vec3 entryPoint;
     vec3 entryFacetNormal;

@@ -2,7 +2,7 @@ import { VBO } from "./gl-utils/vbo";
 
 import { Gemstone } from "./gemstone";
 import { OrbitalCamera } from "./orbital-camera";
-import { ELightDirection, ELightType, Parameters } from "./parameters";
+import { ELightDirection, ELightType, EProjection, Parameters } from "./parameters";
 import { LazyShader } from "./lazy-shader";
 
 import "./page-interface-generated";
@@ -105,11 +105,16 @@ class Drawer {
             this.camera.distance = d;
             this.updateMVPMatrix();
         });
-        this.updateMVPMatrix();
 
         Page.Canvas.Observers.canvasResize.push(() => {
             this.updateMVPMatrix();
         });
+
+        Parameters.addCameraChangeObservers(() => {
+            this.updateMVPMatrix();
+        });
+
+        this.updateMVPMatrix();
 
         gl.enable(gl.CULL_FACE);
         gl.frontFace(gl.CCW);
@@ -162,6 +167,7 @@ class Drawer {
 
                 shader.u["uMVPMatrix"].value = this.mvpMatrix;
                 shader.u["uEyePosition"].value = this.camera.eyePos;
+                shader.u["uOrthographic"].value = (Parameters.projection === EProjection.ORTHOGRAPHIC) ? 1 : 0;
                 if (shader.u["uAbsorption"]) {
                     // when ray depth = 0, this uniform is unused and some drivers delete it, so protect this access
                     shader.u["uAbsorption"].value = [
@@ -205,6 +211,7 @@ class Drawer {
                 shader.a["aPosition"].VBO = this.cubeVBO;
                 shader.u["uMVPMatrix"].value = this.mvpMatrix;
                 shader.u["uEyePosition"].value = this.camera.eyePos;
+                shader.u["uOrthographic"].value = (Parameters.projection === EProjection.ORTHOGRAPHIC) ? 1 : 0;
                 shader.use();
                 shader.bindUniformsAndAttributes();
                 this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 * 2 * 6);
@@ -213,7 +220,17 @@ class Drawer {
     }
 
     private updateMVPMatrix(): void {
-        mat4.perspective(this.pMatrix, 45, Page.Canvas.getAspectRatio(), 0.1, 100.0);
+        const zNear = 0.1;
+        const zFar = 10;
+        const aspectRatio = Page.Canvas.getAspectRatio();
+
+        if (Parameters.projection === EProjection.PERSPECTIVE) {
+            mat4.perspective(this.pMatrix, 45, aspectRatio, zNear, zFar);
+        } else {
+            const distance = 0.5 * this.camera.distance;
+            mat4.ortho(this.pMatrix, -distance * aspectRatio, distance * aspectRatio, -distance, distance, zNear, zFar);
+        }
+
         mat4.multiply(this.mvpMatrix, this.pMatrix, this.camera.viewMatrix);
     }
 

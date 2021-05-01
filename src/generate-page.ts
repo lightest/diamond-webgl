@@ -197,6 +197,23 @@ const data = {
                     defaultValueHex: "#000000",
                 },
                 {
+                    type: Demopage.supportedControls.Tabs,
+                    title: "Projection",
+                    id: "projection-tabs-id",
+                    unique: true,
+                    options: [
+                        {
+                            value: "perspective",
+                            label: "Perspective",
+                            checked: true,
+                        },
+                        {
+                            value: "orthographic",
+                            label: "Orthographic"
+                        },
+                    ]
+                },
+                {
                     type: Demopage.supportedControls.Checkbox,
                     title: "High DPI",
                     id: "high-dpi-checkbox-id",

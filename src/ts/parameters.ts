@@ -11,6 +11,7 @@ const controlId = {
     REFLECTION: "reflection-checkbox-id",
 
     BACKGROUND_COLOR_PICKER: "background-color-picker-id",
+    PROJECTION_TABS_ID: "projection-tabs-id",
     HIGH_DPI_CHEKBOX_ID: "high-dpi-checkbox-id",
 
     LIGHT_TYPE_TABS_ID: "light-type-tabs-id",
@@ -40,11 +41,17 @@ enum ELightDirection {
     UPWARD = "upward",
 }
 
+enum EProjection {
+    PERSPECTIVE = "perspective",
+    ORTHOGRAPHIC = "orthographic",
+}
+
 interface IRGB {
     r: number;
     g: number;
     b: number;
 }
+
 type Observer = () => unknown;
 
 function callObservers(observers: Observer[]): void {
@@ -73,6 +80,9 @@ const callCanvasResizeObservers = () => { callObservers(canvasResizeObservers); 
 Page.Canvas.Observers.canvasResize.push(callCanvasResizeObservers);
 Page.Checkbox.addObserver(controlId.HIGH_DPI_CHEKBOX_ID, callCanvasResizeObservers);
 
+const cameraChangeObservers: Observer[] = [];
+const callCameraChangeObservers = () => { callObservers(cameraChangeObservers); };
+Page.Tabs.addObserver(controlId.PROJECTION_TABS_ID, callCameraChangeObservers);
 
 const backgroundColorChangeObservers: Observer[] = [];
 const backgroundColor: IRGB = { r: 0, g: 0, b: 0 };
@@ -138,6 +148,10 @@ abstract class Parameters {
         return Page.Checkbox.isChecked(controlId.VERBOSE);
     }
 
+    public static get projection(): EProjection {
+        return Page.Tabs.getValues(controlId.PROJECTION_TABS_ID)[0] as EProjection;
+    }
+
     public static get highDPI(): boolean {
         return Page.Checkbox.isChecked(controlId.HIGH_DPI_CHEKBOX_ID);
     }
@@ -186,6 +200,10 @@ abstract class Parameters {
     public static addCanvasResizeObservers(observer: Observer): void {
         canvasResizeObservers.push(observer);
     }
+
+    public static addCameraChangeObservers(observer: Observer): void {
+        cameraChangeObservers.push(observer);
+    }
 }
 
 function updateCustomCutSection(): void {
@@ -206,5 +224,6 @@ Page.Checkbox.addObserver(controlId.DISPLAY_INDICATORS, updateIndicatorsVisibili
 export {
     ELightDirection,
     ELightType,
+    EProjection,
     Parameters,
 };

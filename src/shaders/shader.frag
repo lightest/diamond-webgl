@@ -5,6 +5,7 @@ precision mediump float;
 #endif
 
 uniform vec3 uEyePosition;
+uniform float uOrthographic;
 uniform vec3 uAbsorption;
 uniform float uDisplayNormals;
 uniform float uDisplayReflection;
@@ -96,7 +97,7 @@ vec3 computeDiamondColor(vec3 currentPoint, vec3 currentDirection, vec3 currentF
 }
 
 void main(void) {
-    vec3 fromEyeNormalized = normalize(vPosition - uEyePosition);
+    vec3 fromEyeNormalized = normalize(mix(vPosition - uEyePosition, -uEyePosition, uOrthographic));
 
     float etaEnteringGem = 1.0 / uRefractionIndex;
     float cosCriticalAngleEnteringGem = sqrt(max(0.0, 1.0 - uRefractionIndex * uRefractionIndex));
