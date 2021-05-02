@@ -12,6 +12,7 @@ const controlId = {
 
     BACKGROUND_COLOR_PICKER: "background-color-picker-id",
     PROJECTION_TABS_ID: "projection-tabs-id",
+    GEOMETRY_ONLY_CHECKBOX_ID: "only-normals-checkbox-id",
     POST_PROCESSING_CHECKBOX_ID: "post-processing-checkbox-id",
     HIGH_DPI_CHEKBOX_ID: "high-dpi-checkbox-id",
 
@@ -151,6 +152,10 @@ abstract class Parameters {
 
     public static get projection(): EProjection {
         return Page.Tabs.getValues(controlId.PROJECTION_TABS_ID)[0] as EProjection;
+    }
+
+    public static get geometryOnly(): boolean {
+        return Page.Checkbox.isChecked(controlId.GEOMETRY_ONLY_CHECKBOX_ID);
     }
 
     public static get postProcessing(): boolean {

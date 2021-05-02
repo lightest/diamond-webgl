@@ -1,4 +1,5 @@
 import { VBO } from "./gl-utils/vbo";
+import { Shader } from "./gl-utils/shader";
 
 import { Gemstone } from "./gemstone";
 import { OrbitalCamera } from "./orbital-camera";
@@ -65,6 +66,7 @@ class Drawer {
 
     private readonly shader: LazyShader;
     private readonly raytracedVolumeShader: LazyShader;
+    private readonly normalsShader: LazyShader;
 
     private readonly geometryVBO: WebGLBuffer;
 
@@ -80,6 +82,7 @@ class Drawer {
 
         this.shader = new LazyShader("shader.frag", "shader.vert", "default shader");
         this.raytracedVolumeShader = new LazyShader("raytracedVolume.frag", "raytracedVolume.vert", "debug raytraced shader");
+        this.normalsShader = new LazyShader("normals.frag", "shader.vert", "normals shader");
 
         this.pMatrix = mat4.create();
         this.mvpMatrix = mat4.create();
@@ -157,45 +160,44 @@ class Drawer {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
         if (this.gemstone) {
-            const shader = this.shader.shader;
+            if (Parameters.geometryOnly) {
+                const shader = this.normalsShader.shader;
+                if (shader) {
+                    Page.Canvas.showLoader(false);
 
-            if (shader) {
-                Page.Canvas.showLoader(false);
-
-                const isASETSkybox = (Parameters.lightType === ELightType.ASET);
-                const gemColor = isASETSkybox ? { r: 250, g: 250, b: 250 } : Parameters.gemColor;
-                const gemAbsorption = Parameters.absorption;
-
-                shader.u["uMVPMatrix"].value = this.mvpMatrix;
-                shader.u["uEyePosition"].value = this.camera.eyePos;
-                shader.u["uOrthographic"].value = (Parameters.projection === EProjection.ORTHOGRAPHIC) ? 1 : 0;
-                if (shader.u["uAbsorption"]) {
-                    // when ray depth = 0, this uniform is unused and some drivers delete it, so protect this access
-                    shader.u["uAbsorption"].value = [
-                        gemAbsorption * (1 - gemColor.r / 255),
-                        gemAbsorption * (1 - gemColor.g / 255),
-                        gemAbsorption * (1 - gemColor.b / 255),
-                    ];
+                    shader.u["uMVPMatrix"].value = this.mvpMatrix;
+                    shader.use();
+                    this.bindAndDrawGeometry(shader);
                 }
-                shader.u["uDisplayNormals"].value = Parameters.displayNormals ? 1 : 0;
-                shader.u["uRefractionIndex"].value = Parameters.refractionIndex;
-                shader.u["uDisplayReflection"].value = Parameters.displayReflection ? 1 : 0;
-                shader.u["uASETSkybox"].value = isASETSkybox ? 1 : 0;
-                shader.u["uLightDirection"].value = (Parameters.lightDirection === ELightDirection.DOWNWARD) ? 1 : -1;
-                shader.use();
+            } else {
+                const shader = this.shader.shader;
+                if (shader) {
+                    Page.Canvas.showLoader(false);
 
-                const BYTES_PER_FLOAT = 4;
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.geometryVBO);
-                const aPositionLoc = shader.a["aPosition"].loc;
-                this.gl.enableVertexAttribArray(aPositionLoc);
-                this.gl.vertexAttribPointer(aPositionLoc, 3, this.gl.FLOAT, false, 2 * 3 * BYTES_PER_FLOAT, 0);
+                    const isASETSkybox = (Parameters.lightType === ELightType.ASET);
+                    const gemColor = isASETSkybox ? { r: 250, g: 250, b: 250 } : Parameters.gemColor;
+                    const gemAbsorption = Parameters.absorption;
 
-                const aNormalLoc = shader.a["aNormal"].loc;
-                this.gl.enableVertexAttribArray(aNormalLoc);
-                this.gl.vertexAttribPointer(aNormalLoc, 3, this.gl.FLOAT, false, 2 * 3 * BYTES_PER_FLOAT, 3 * BYTES_PER_FLOAT);
+                    shader.u["uMVPMatrix"].value = this.mvpMatrix;
+                    shader.u["uEyePosition"].value = this.camera.eyePos;
+                    shader.u["uOrthographic"].value = (Parameters.projection === EProjection.ORTHOGRAPHIC) ? 1 : 0;
+                    if (shader.u["uAbsorption"]) {
+                        // when ray depth = 0, this uniform is unused and some drivers delete it, so protect this access
+                        shader.u["uAbsorption"].value = [
+                            gemAbsorption * (1 - gemColor.r / 255),
+                            gemAbsorption * (1 - gemColor.g / 255),
+                            gemAbsorption * (1 - gemColor.b / 255),
+                        ];
+                    }
+                    shader.u["uDisplayNormals"].value = Parameters.displayNormals ? 1 : 0;
+                    shader.u["uRefractionIndex"].value = Parameters.refractionIndex;
+                    shader.u["uDisplayReflection"].value = Parameters.displayReflection ? 1 : 0;
+                    shader.u["uASETSkybox"].value = isASETSkybox ? 1 : 0;
+                    shader.u["uLightDirection"].value = (Parameters.lightDirection === ELightDirection.DOWNWARD) ? 1 : -1;
+                    shader.use();
 
-                shader.bindUniformsAndAttributes();
-                this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 * this.gemstone.nbTriangles);
+                    this.bindAndDrawGeometry(shader);
+                }
             }
         }
     }
@@ -218,6 +220,21 @@ class Drawer {
                 this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 * 2 * 6);
             }
         }
+    }
+
+    private bindAndDrawGeometry(shader: Shader): void {
+        const BYTES_PER_FLOAT = 4;
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.geometryVBO);
+        const aPositionLoc = shader.a["aPosition"].loc;
+        this.gl.enableVertexAttribArray(aPositionLoc);
+        this.gl.vertexAttribPointer(aPositionLoc, 3, this.gl.FLOAT, false, 2 * 3 * BYTES_PER_FLOAT, 0);
+
+        const aNormalLoc = shader.a["aNormal"].loc;
+        this.gl.enableVertexAttribArray(aNormalLoc);
+        this.gl.vertexAttribPointer(aNormalLoc, 3, this.gl.FLOAT, false, 2 * 3 * BYTES_PER_FLOAT, 3 * BYTES_PER_FLOAT);
+
+        shader.bindUniformsAndAttributes();
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 * this.gemstone.nbTriangles);
     }
 
     private updateMVPMatrix(): void {

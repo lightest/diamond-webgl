@@ -215,6 +215,12 @@ const data = {
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
+                    title: "Geometry only",
+                    id: "only-normals-checkbox-id",
+                    checked: false,
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
                     title: "Post processing",
                     id: "post-processing-checkbox-id",
                     checked: false,
