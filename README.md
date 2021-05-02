@@ -36,7 +36,7 @@ The ASET image of a high quality diamond should:
 - have blue areas that are very distinct from the red and green ones. This contributes to creating good contrasts between bright and dark areas.
 
 
-Here is an ASET image of a perfect diamond I generated with this project, and its decomposition:
+To generate an ASET image, orthographic projection should be used to avoid deformation due to perspective when being too close to the gem. Here is an ASET image of a perfect diamond I generated with this project, and its decomposition:
 
 ![ASET illustration](src/readme/ASET_decomposition.png)
 
