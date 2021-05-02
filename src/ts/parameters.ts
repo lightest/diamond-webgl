@@ -13,6 +13,7 @@ const controlId = {
     BACKGROUND_COLOR_PICKER: "background-color-picker-id",
     PROJECTION_TABS_ID: "projection-tabs-id",
     GEOMETRY_ONLY_CHECKBOX_ID: "only-normals-checkbox-id",
+    AUTO_ROTATE_CHECKBOX_ID: "auto-rotate-checkbox-id",
     POST_PROCESSING_CHECKBOX_ID: "post-processing-checkbox-id",
     HIGH_DPI_CHEKBOX_ID: "high-dpi-checkbox-id",
 
@@ -156,6 +157,10 @@ abstract class Parameters {
 
     public static get geometryOnly(): boolean {
         return Page.Checkbox.isChecked(controlId.GEOMETRY_ONLY_CHECKBOX_ID);
+    }
+
+    public static get autoRotate(): boolean {
+        return Page.Checkbox.isChecked(controlId.AUTO_ROTATE_CHECKBOX_ID);
     }
 
     public static get postProcessing(): boolean {

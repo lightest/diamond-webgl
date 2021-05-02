@@ -37,13 +37,22 @@ function main(): void {
     Parameters.addCutChangeObserver(loadGemstone);
     loadGemstone();
 
+    let lastLoopUpdate = 0;
     function mainLoop(): void {
+        const now = performance.now();
+        const dt = performance.now() - lastLoopUpdate;
+        lastLoopUpdate = now;
+
         FPSIndicator.registerFrame();
 
         if (needToAdjustCanvasSize) {
             GLCanvas.adjustSize(Parameters.highDPI);
             Viewport.setFullCanvas(gl);
             needToAdjustCanvasSize = false;
+        }
+
+        if (Parameters.autoRotate && !Page.Canvas.isMouseDown()) {
+            drawer.rotate(dt * 0.0001);
         }
 
         if (Parameters.displayRaytracedVolume) {

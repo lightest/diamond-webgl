@@ -156,6 +156,11 @@ class Drawer {
         }
     }
 
+    public rotate(deltaAngle: number): void {
+        this.camera.theta += deltaAngle;
+        this.updateMVPMatrix();
+    }
+
     public draw(): void {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 

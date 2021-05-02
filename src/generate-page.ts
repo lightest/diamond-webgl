@@ -221,6 +221,12 @@ const data = {
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
+                    title: "Auto rotate",
+                    id: "auto-rotate-checkbox-id",
+                    checked: true,
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
                     title: "Post processing",
                     id: "post-processing-checkbox-id",
                     checked: false,
