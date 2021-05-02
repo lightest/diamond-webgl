@@ -237,6 +237,12 @@ const data = {
                     id: "high-dpi-checkbox-id",
                     checked: false,
                 },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Indicators",
+                    id: "display-indicators-checkbox-id",
+                    checked: true,
+                },
             ]
         },
         {
@@ -280,6 +286,7 @@ const data = {
         },
         {
             title: "Debug",
+            id: "debug-section-id",
             controls: [
                 {
                     type: Demopage.supportedControls.Checkbox,
@@ -292,12 +299,6 @@ const data = {
                     title: "Display normals",
                     id: "display-normals-checkbox-id",
                     checked: false,
-                },
-                {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Indicators",
-                    id: "display-indicators-checkbox-id",
-                    checked: true,
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,

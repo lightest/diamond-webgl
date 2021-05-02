@@ -236,6 +236,15 @@ function updateIndicatorsVisibility(): void {
 updateIndicatorsVisibility();
 Page.Checkbox.addObserver(controlId.DISPLAY_INDICATORS, updateIndicatorsVisibility);
 
+{
+    let isInDebug = false;
+    if (typeof URLSearchParams !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        isInDebug = urlParams.get('debug') === "1";
+    }
+    Page.Sections.setVisibility("debug-section-id", isInDebug);
+}
+
 export {
     ELightDirection,
     ELightType,
