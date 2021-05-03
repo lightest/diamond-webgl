@@ -9,6 +9,8 @@ import { Parameters } from "./parameters";
 import { registerPolyfills } from "./utils";
 import { PostProcessing } from "./post-processing";
 
+import "./page-interface-generated";
+
 
 function main(): void {
     registerPolyfills();

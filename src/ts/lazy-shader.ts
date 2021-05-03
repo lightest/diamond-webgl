@@ -1,6 +1,8 @@
 import { Shader } from "./gl-utils/shader";
 import * as ShaderManager from "./gl-utils/shader-manager";
 
+import "./page-interface-generated";
+
 
 enum ELoadingState {
     NOT_LOADED,
