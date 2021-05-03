@@ -1,6 +1,8 @@
 import { computeIntersection, computePlaneFromTriangle, computeTriangleNormal, cylindric, IOrientedPlane, IPoint, isInPlane, isInsideVolume, ITriangle, rotateZ } from "./geometry";
 import { Parameters } from "./parameters";
 
+import "./page-interface-generated";
+
 
 function logParsingInfo(message: string): void {
     if (Parameters.verbose) {
@@ -30,7 +32,7 @@ class Gemstone {
                     callback(null);
                 }
             });
-            request.open("GET", `models/${name}`);
+            request.open("GET", `models/${name}?v=${Page.version}`);
             request.send();
         }
     }

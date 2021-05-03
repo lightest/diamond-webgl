@@ -1,4 +1,4 @@
-type LoadCallback = (success: boolean)  => void;
+type LoadCallback = (success: boolean) => void;
 
 interface ICachedSource {
     text: string;
@@ -28,8 +28,12 @@ function loadSource(filename: string, callback: LoadCallback): void {
         };
         const cached = cachedSources[filename];
 
+        let url = "./shaders/" + filename;
+        if (typeof Page.version !== "undefined") {
+            url += `?v=${Page.version}`;
+        }
         const xhr = new XMLHttpRequest();
-        xhr.open("GET", "./shaders/" + filename, true);
+        xhr.open("GET", url, true);
         xhr.onload = () => {
             if (xhr.readyState === 4) {
                 cached.pending = false;
