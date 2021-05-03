@@ -151,6 +151,7 @@ class ShaderProgram extends GLResource {
             const compileSuccess = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
             if (!compileSuccess) {
                 console.error(gl.getShaderInfoLog(shader));
+                console.log(source);
                 gl.deleteShader(shader);
                 return null;
             }
