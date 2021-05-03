@@ -158,6 +158,13 @@ class Drawer {
 
             Page.Canvas.setIndicatorText("triangles-count-indicator", gemstone.nbTriangles.toString());
             Page.Canvas.setIndicatorText("facets-count-indicator", gemstone.facets.length.toString());
+
+            const CONVEXITY_ERROR_KEY = "shape_not_convex";
+            if (this.gemstone.isConvex) {
+                Page.Demopage.setErrorMessage(CONVEXITY_ERROR_KEY, "");
+            } else {
+                Page.Demopage.setErrorMessage(CONVEXITY_ERROR_KEY, "The current geometry is not supported. The simulation will not look as expected.");
+            }
         }
     }
 

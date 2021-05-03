@@ -103,7 +103,7 @@ class Gemstone {
     public readonly facets: IOrientedPlane[];
     public readonly bufferData: Float32Array;
     public readonly nbTriangles: number;
-    private readonly isConvex: boolean;
+    public readonly isConvex: boolean;
 
     private constructor(triangles: ITriangle[]) {
         Gemstone.mutualizeTrianglesVertices(triangles);
