@@ -125,6 +125,12 @@ const data = {
                     id: "reflection-checkbox-id",
                     checked: true,
                 },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Auto rotate",
+                    id: "auto-rotate-checkbox-id",
+                    checked: true,
+                },
             ],
         },
         {
@@ -200,12 +206,6 @@ const data = {
             title: "Rendering",
             controls: [
                 {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Display skybox",
-                    id: "display-skybox-checkbox-id",
-                    checked: false,
-                },
-                {
                     type: Demopage.supportedControls.ColorPicker,
                     title: "Background",
                     id: "background-color-picker-id",
@@ -233,12 +233,6 @@ const data = {
                     title: "Geometry only",
                     id: "only-normals-checkbox-id",
                     checked: false,
-                },
-                {
-                    type: Demopage.supportedControls.Checkbox,
-                    title: "Auto rotate",
-                    id: "auto-rotate-checkbox-id",
-                    checked: true,
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
@@ -296,7 +290,13 @@ const data = {
                             label: "Bottom"
                         },
                     ]
-                }
+                },
+                {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Use as skybox",
+                    id: "display-skybox-checkbox-id",
+                    checked: false,
+                },
             ]
         },
         {
