@@ -238,8 +238,8 @@ function updateIndicatorsVisibility(): void {
     const visible = Page.Checkbox.isChecked(controlId.DISPLAY_INDICATORS);
     Page.Canvas.setIndicatorsVisibility(visible);
 }
-updateIndicatorsVisibility();
 Page.Checkbox.addObserver(controlId.DISPLAY_INDICATORS, updateIndicatorsVisibility);
+updateIndicatorsVisibility();
 
 {
     let isInDebug = false;
