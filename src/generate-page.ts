@@ -90,7 +90,7 @@ const data = {
                     type: Demopage.supportedControls.ColorPicker,
                     title: "Color",
                     id: "gem-color-picker-id",
-                    defaultValueHex: "#C2CBDE",
+                    defaultValueHex: "#CFD3D9",
                 },
                 {
                     type: Demopage.supportedControls.Range,
@@ -98,7 +98,7 @@ const data = {
                     id: "absorption-range-id",
                     min: 0,
                     max: 10,
-                    value: 1,
+                    value: 2,
                     step: 0.1
                 },
                 {
@@ -107,7 +107,7 @@ const data = {
                     id: "dispersion-range-id",
                     min: 0,
                     max: 0.3,
-                    value: 0.044,
+                    value: 0,
                     step: 0.001
                 },
                 {
@@ -244,7 +244,7 @@ const data = {
                     type: Demopage.supportedControls.Checkbox,
                     title: "Post processing",
                     id: "post-processing-checkbox-id",
-                    checked: false,
+                    checked: true,
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
@@ -256,7 +256,7 @@ const data = {
                     type: Demopage.supportedControls.Checkbox,
                     title: "Indicators",
                     id: "display-indicators-checkbox-id",
-                    checked: true,
+                    checked: false,
                 },
             ]
         },
