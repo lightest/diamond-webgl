@@ -57,7 +57,7 @@ class PostProcessing {
 
     public prepare(): void {
         const dpiScaling = Parameters.highDPI ? window.devicePixelRatio : 1;
-        const smallerTextureScaling = 1 / (4 * dpiScaling);
+        const smallerTextureScaling = 1 / (8 * dpiScaling);
 
         this.initializeTexture(this.fullSizeTexture, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
         this.initializeTexture(this.downsizedTexture, smallerTextureScaling * this.fullSizeTexture.width, smallerTextureScaling * this.fullSizeTexture.height);
