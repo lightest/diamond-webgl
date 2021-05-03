@@ -190,8 +190,8 @@ class PostProcessing {
 
         const instructions: string[] = [];
         for (let i = -radius - 0.5; i <= radius + 0.5; i++) {
-            instructions.push(`blurred += ${factor(i) / total} * contribution(0.707 * vec2(${i}, ${i}));`);
-            instructions.push(`blurred += ${factor(i) / total} * contribution(0.707 * vec2(${i}, ${-i}));`);
+            instructions.push(`blurred += ${factor(i) / total} * contribution(vec2(${i}, ${i}));`);
+            instructions.push(`blurred += ${factor(i) / total} * contribution(vec2(${i}, ${-i}));`);
         }
         instructions.push(`blurred *= 0.5;`); // normalize
         instructions.push(`blurred *= 0.5;`);
