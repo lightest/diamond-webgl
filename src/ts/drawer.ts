@@ -266,7 +266,7 @@ class Drawer {
 
     private updateMVPMatrix(): void {
         const zNear = 0.1;
-        const zFar = 10;
+        const zFar = 50.0;
         const aspectRatio = Page.Canvas.getAspectRatio();
 
         if (Parameters.projection === EProjection.PERSPECTIVE) {
