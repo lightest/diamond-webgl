@@ -20,6 +20,8 @@ const int rayDepth = #INJECT(RAY_DEPTH);
 
 #INJECT(FACETS_DEFINITION)
 
+#include "_skybox.frag"
+
 float checkNextInternalIntersection(const vec3 planePoint, const vec3 planeNormal, const vec3 position, const vec3 direction, inout float theta, inout vec3 facetNormal) {
     float b = dot(direction, planeNormal);
     if (b > 0.0) {
@@ -37,19 +39,6 @@ float computeInternalIntersection(const vec3 position, const vec3 direction, ino
     float theta = 100000.0;
     #INJECT(COMPUTE_INTERNAL_INTERSECTION)
     return theta;
-}
-
-vec3 sampleSkybox(const vec3 direction) {
-    float z = uLightDirection * direction.z;
-
-    vec3 asetSkybox = vec3(
-        step(0.70, z) * step(z, 0.98),
-        step(0.0, z) * step(z, 0.70),
-        step(0.98, z)
-    );
-    vec3 skybox = 0.8 * mix(vec3(0.3), vec3(2), step(0.4, z) * step(z, 0.95));
-
-    return mix(skybox, asetSkybox, uASETSkybox);
 }
 
 /** @param eta              refraction_index_current / refraction_index_other

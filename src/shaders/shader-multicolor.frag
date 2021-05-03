@@ -18,6 +18,8 @@ const int rayDepth = #INJECT(RAY_DEPTH);
 
 #INJECT(FACETS_DEFINITION)
 
+#include "_skybox-monochrome.frag"
+
 float checkNextInternalIntersection(const vec3 planePoint, const vec3 planeNormal, const vec3 position, const vec3 direction, inout float theta, inout vec3 facetNormal) {
     float b = dot(direction, planeNormal);
     if (b > 0.0) {
@@ -35,11 +37,6 @@ float computeInternalIntersection(const vec3 position, const vec3 direction, ino
     float theta = 100000.0;
     #INJECT(COMPUTE_INTERNAL_INTERSECTION)
     return theta;
-}
-
-float sampleSkybox(const vec3 direction) {
-    float z = uLightDirection * direction.z;
-    return 0.8 * mix(0.3, 2.0, step(-0.5, z) * step(z, 0.95));
 }
 
 /** @param eta              refraction_index_current / refraction_index_other
@@ -75,7 +72,7 @@ float computeDiamondColor(vec3 currentPoint, vec3 currentDirection, vec3 current
         float fresnelReflection = computeFresnelReflection(currentDirection, -currentFacetNormal, refractedRay, etaExitingGem, cosCriticalAngleExitingGem);
     
         totalDepthInside += theta;
-        cumulatedColor += rayStrength * (1.0 - fresnelReflection) * sampleSkybox(refractedRay) * exp(-absorption * totalDepthInside);
+        cumulatedColor += rayStrength * (1.0 - fresnelReflection) * sampleSkyboxMonochrome(refractedRay) * exp(-absorption * totalDepthInside);
         rayStrength *= fresnelReflection;
 
         if (rayStrength < 0.001) {
@@ -108,7 +105,7 @@ void main(void) {
     );
 
     vec3 reflectedRay = reflect(fromEyeNormalized, entryFacetNormal);
-    vec3 reflectedColor = vec3(sampleSkybox(reflectedRay));
+    vec3 reflectedColor = vec3(sampleSkyboxMonochrome(reflectedRay));
 
     vec3 fresnelReflection = uDisplayReflection * vec3(
         computeFresnelReflection(fromEyeNormalized, entryFacetNormal, entryDirectionRed, etaEnteringGem.r, cosCriticalAngleEnteringGem.r),
