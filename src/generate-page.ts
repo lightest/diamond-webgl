@@ -200,6 +200,12 @@ const data = {
             title: "Rendering",
             controls: [
                 {
+                    type: Demopage.supportedControls.Checkbox,
+                    title: "Display skybox",
+                    id: "display-skybox-checkbox-id",
+                    checked: false,
+                },
+                {
                     type: Demopage.supportedControls.ColorPicker,
                     title: "Background",
                     id: "background-color-picker-id",

@@ -68,6 +68,7 @@ class Drawer {
     private readonly shaderMulticolor: LazyShader;
     private readonly raytracedVolumeShader: LazyShader;
     private readonly normalsShader: LazyShader;
+    private readonly shadersSkybox: LazyShader;
 
     private readonly geometryVBO: WebGLBuffer;
 
@@ -85,6 +86,7 @@ class Drawer {
         this.shaderMulticolor = new LazyShader("shader-multicolor.frag", "shader.vert", "shader with dispersion");
         this.raytracedVolumeShader = new LazyShader("raytracedVolume.frag", "raytracedVolume.vert", "debug raytraced shader");
         this.normalsShader = new LazyShader("normals.frag", "shader.vert", "normals shader");
+        this.shadersSkybox = new LazyShader("skybox.frag", "skybox.vert", "skybox shader");
 
         this.pMatrix = mat4.create();
         this.mvpMatrix = mat4.create();
@@ -166,6 +168,10 @@ class Drawer {
 
     public draw(): void {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+        if (Parameters.displaySkybox) {
+            this.drawSkybox();
+        }
 
         if (!this.gemstone) {
             return; // nothing to draw
@@ -261,6 +267,21 @@ class Drawer {
                 shader.bindUniformsAndAttributes();
                 this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 * 2 * 6);
             }
+        }
+    }
+
+    private drawSkybox(): void {
+        const skyboxShader = this.shadersSkybox.shader;
+        if (skyboxShader) {
+            skyboxShader.a["aPosition"].VBO = this.cubeVBO;
+            skyboxShader.u["uMVPMatrix"].value = this.mvpMatrix;
+            skyboxShader.u["uEyePosition"].value = this.camera.eyePos;
+            skyboxShader.u["uOrthographic"].value = (Parameters.projection === EProjection.ORTHOGRAPHIC) ? 1 : 0;
+            skyboxShader.u["uASETSkybox"].value = (Parameters.lightType === ELightType.ASET) ? 1 : 0;
+            skyboxShader.u["uLightDirection"].value = (Parameters.lightDirection === ELightDirection.DOWNWARD) ? 1 : -1;
+            skyboxShader.use();
+            skyboxShader.bindUniformsAndAttributes();
+            this.gl.drawArrays(this.gl.TRIANGLES, 0, 3 * 2 * 6);
         }
     }
 

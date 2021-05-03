@@ -11,6 +11,7 @@ const controlId = {
     RAY_DEPTH_RANGE_ID: "ray-depth-range-id",
     REFLECTION: "reflection-checkbox-id",
 
+    DISPLAY_SKYBOX_CHECKBOX_ID: "display-skybox-checkbox-id",
     BACKGROUND_COLOR_PICKER: "background-color-picker-id",
     PROJECTION_TABS_ID: "projection-tabs-id",
     GEOMETRY_ONLY_CHECKBOX_ID: "only-normals-checkbox-id",
@@ -118,6 +119,10 @@ abstract class Parameters {
 
     public static get refractionIndex(): number {
         return Page.Range.getValue(controlId.REFRACTION_RANGE_ID);
+    }
+
+    public static get displaySkybox(): boolean {
+        return Page.Checkbox.isChecked(controlId.DISPLAY_SKYBOX_CHECKBOX_ID);
     }
 
     public static get backgroundColor(): IRGB {
@@ -240,6 +245,12 @@ function updateIndicatorsVisibility(): void {
 }
 Page.Checkbox.addObserver(controlId.DISPLAY_INDICATORS, updateIndicatorsVisibility);
 updateIndicatorsVisibility();
+
+function updateBackgroundVisibility(): void {
+    Page.Controls.setVisibility(controlId.BACKGROUND_COLOR_PICKER, !Parameters.displaySkybox);
+}
+Page.Checkbox.addObserver(controlId.DISPLAY_SKYBOX_CHECKBOX_ID, updateBackgroundVisibility);
+updateBackgroundVisibility();
 
 {
     let isInDebug = false;
