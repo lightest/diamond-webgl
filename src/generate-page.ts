@@ -103,6 +103,15 @@ const data = {
                 },
                 {
                     type: Demopage.supportedControls.Range,
+                    title: "Dispersion",
+                    id: "dispersion-range-id",
+                    min: 0,
+                    max: 0.3,
+                    value: 0.044,
+                    step: 0.001
+                },
+                {
+                    type: Demopage.supportedControls.Range,
                     title: "Ray depth",
                     id: "ray-depth-range-id",
                     min: 0,

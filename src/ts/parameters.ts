@@ -7,6 +7,7 @@ const controlId = {
     REFRACTION_RANGE_ID: "refraction-range-id",
     GEM_COLOR_PICKER: "gem-color-picker-id",
     GEM_ABSOPTION_RANGE_ID: "absorption-range-id",
+    DISPERSION_RANGE_ID: "dispersion-range-id",
     RAY_DEPTH_RANGE_ID: "ray-depth-range-id",
     REFLECTION: "reflection-checkbox-id",
 
@@ -129,6 +130,10 @@ abstract class Parameters {
 
     public static get absorption(): number {
         return Page.Range.getValue(controlId.GEM_ABSOPTION_RANGE_ID);
+    }
+
+    public static get dispersion(): number {
+        return Page.Range.getValue(controlId.DISPERSION_RANGE_ID);
     }
 
     public static get rayDepth(): number {
