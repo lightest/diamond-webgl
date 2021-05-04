@@ -4,12 +4,12 @@ import * as path from "path";
 import { Demopage } from "webpage-templates";
 
 const data = {
-    title: "Gems",
+    title: "Diamond",
     description: "PLACEHOLDER_DESCRIPTION",
     introduction: [
         "PLACEHOLDER_INTRODUCTION",
     ],
-    githubProjectName: "gems-webgl",
+    githubProjectName: "diamond-webgl",
     additionalLinks: [],
     styleFiles: [],
     scriptFiles: [

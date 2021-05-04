@@ -1,6 +1,6 @@
 {
-  "name": "gems-webgl",
-  "homepage": "https://piellardj.github.io/gems-webgl",
+  "name": "diamond-webgl",
+  "homepage": "https://piellardj.github.io/diamond-webgl",
   "main": "build/index.js",
   "scripts": {
     "pre-commit": "npm run rebuild && npm run lint",
@@ -13,7 +13,7 @@
     "webpack": "webpack --config src/config/webpack.config.js"
   },
   "author": "Jérémie PIELLARD <jeremie.piellard@gmail.com> (https://github.com/piellardj)",
-  "repository": "github:piellardj/gems-webgl",
+  "repository": "github:piellardj/diamond-webgl",
   "devDependencies": {
     "@types/node": "^15.0.1",
     "fs-extra": "^9.1.0",
