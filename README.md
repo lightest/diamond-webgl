@@ -22,7 +22,7 @@ One of the most popular diamond cuts is the brilliant cut. Subtle variations in 
 A common tool to evaluate the quality of the diamond cut is the Angular Spectrum Evaluation Tool (ASET) image evaluation. Such an image helps to check the way the diamond gives light back (cut proportions, symmetry etc.).
 
 ![ASET illustration](src/readme/ASET.png)
-*On the left, diamond in natural light. On the right, ASET vizualiation. Image credits: www.diamondbuyingadvice.com*
+*On the left, diamond in natural light. On the right, ASET visualization. Image credits: www.diamondbuyingadvice.com*
 
 ASET images can either be taken with in with an ASET scope, or be computed. Here is how it is built:
 
@@ -36,12 +36,19 @@ The ASET image of a high quality diamond should:
 - have blue areas that are very distinct from the red and green ones. This contributes to creating good contrasts between bright and dark areas.
 
 
-To generate an ASET image, orthographic projection should be used to avoid deformation due to perspective when being too close to the gem. Here is an ASET image of a perfect diamond I generated with this project, and its decomposition:
+To generate an ASET image, orthographic projection should be used to avoid deformations due to perspective projection, especially when being too close to the gem. This project is accurate enough to generate realistic ASET images in real time. For instance, here are the visualizations of a diamond with an ideal brilliant cut, and their decomposition:
 
-![ASET illustration](src/readme/ASET_decomposition.png)
+![ASET illustration arrows](src/readme/ASET_arrows_decomposition.png)
+*Viewed from top, the arrows of the diamond are visible in the blue component of ASET*
+![ASET illustration hearts](src/readme/ASET_hearts_decomposition.png)
+*Viewed from bottom, the hearts of the diamond are visible in the red component of ASET*
 
 ## Implementation details
-This project is essentially ray tracing. The main parts are:
+This project uses both the rasterizer and ray tracing:
+- the rasterizer is used to get the entry point of the light ray in the diamond, and the surface normal at this point
+- then ray tracing is used to compute the trajectory of the ray inside the gem.
+
+The main parts are:
 - modeling the diamond
 - simulating the behaviour of light using laws of geometrical optics
 - detection of intersections between the light ray and the surface of the diamond. This needs to be efficient because it will be performed at most 20 times per fragment.
@@ -179,9 +186,9 @@ No medium is completely transparent: the light is a partially absorbed by the ma
 
 #### Bloom
 A small bloom effect is performed by:
-- rendering to a texture, at full size
-- copying this texture into a smaller one (to the next part faster) and extracting the bright parts
-- blurring the small texture (I don't use a gaussian blur, but simply blur 2 two directions in one pass to create a sparkle effect)
+- rendering to an off-screen texture, at full size
+- copying this texture into a smaller one (to make the next part cheaper) and extracting the bright parts
+- blurring the small texture (I don't use a gaussian blur, but simply blur in two directions in one pass to create a sparkle effect)
 - finally, combining both the full-sized and small texture
 
 <table>
@@ -203,11 +210,19 @@ A small bloom effect is performed by:
 
 #### Antialiasing
 In this scene there are 2 types of aliasing:
-- on the edges of the geometry (outline of the diamond). This one is due to the rasterization.
-- inside the diamond. This is due to the processing of each fragment.
+- on the edges of the geometry. This one is due to the rasterization.
+- inside the diamond. This one is due to the processing of each fragment which might lead to neighbour fragments having very different colors.
 
 On my machine, asking for antialiasing with the `antialias` [WebGL flag](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext) only removes the first type of aliasing. This makes me think it uses a kind of MSAA because a SSAA would also remove the fragment aliasing. I am not sure it is part of the WebGL spec, it is probably implementation-dependent.
 
 When doing post-processing, I first render a scene to an off-screen texture. Unfortunately, WebGL 1 does not support antialiasing when rendering to a texture. To antialias the scene, I have two options:
 - do a kind of SSAA where I use a texture twice larger than the screen, which I downsize back to screen dimensions later. I cannot do this because it would lead to way too many fragments being processed (each fragment takes a lot of processing power in a ray-tracing application).
-- or apply myself a custom antialiasing such as FXAA. This is the right approach but I didn't bother.
+- or apply myself a custom antialiasing such as FXAA, which does not require to upsize any buffer. This is the right approach but I didn't bother.
+
+## Other approaches
+This ray tracing project is quite processing-heavy for the GPU because for each fragment and each ray rebound, we have to check intersection with all facets of the gem. For a typical diamond, it is 89 intersections. (In reality it is a bit less than this because the shader tries to skip facets that are behind.) The overall complexite is roughly FRAGMENTS_COUNTxREBOUNDS_COUNTxFACETS_COUNTS.
+
+Another approach would be to first generate a cube map of the diamond sides seen from the center of the gem, and then sample this texture directly in the direction of the ray. This way, the complexity is only FRAGMENTS_COUNTxREBOUNDS_COUNT. However, this leads to 2 issues:
+- first, the precision is dependent of the resolution of the cube map
+- then, this approach is by essence not accurate, because the diamond is not a sphere, so its projection would be deformed.  An adjustment mechanism would be necessary, which would cost more texture fetches. 
+
