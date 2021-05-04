@@ -226,10 +226,7 @@ A small sparkle effect is performed. It is essentially much a bloom with a bidir
 
 <div style="text-align:center">
     <div>
-        <img style="width:30%;max-width:512px" src="src/readme/bloom_fullsize.png"/>
-        <img style="width:10%;max-width:64px" src="src/readme/bloom_downsized.png"/>
-        <img style="width:10%;max-width:64px" src="src/readme/bloom_blurred.png"/>
-        <img style="width:30%;max-width:512px" src="src/readme/bloom_final.png"/>
+        <img src="src/readme/bloom_chain.png"/>
     </div>
     <p>
         <i>These are the steps for the sparkle post-processing effect.</i>
