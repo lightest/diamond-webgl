@@ -61,7 +61,7 @@ function main(): void {
         if (Parameters.displayRaytracedVolume) {
             drawer.drawDebugVolume();
         } else {
-            if (Parameters.postProcessing && postProcessing.isReady) {
+            if (Parameters.postProcessing && postProcessing.isReady()) {
                 postProcessing.prepare();
                 drawer.draw();
                 postProcessing.apply();
