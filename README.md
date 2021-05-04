@@ -16,17 +16,19 @@ The beauty of a diamond resides not only in the purity of the gem, but also in t
 
 One of the most popular diamond cuts is the brilliant cut. Subtle variations in the proportions change greatly the way light is reflected and can make the difference between a mediocre and an ideal diamond. It is described in by a few key lengths:
 
-<img src="src/readme/diamond_brilliant_cut.png"/>
+![Diagram of a_round_brilliant_cut](src/readme/diamond_brilliant_cut.png)\
+*Diagram of a round brilliant cut*
 
 ### ASET evaluation
 A common tool to evaluate the quality of the diamond cut is the Angular Spectrum Evaluation Tool (ASET) image evaluation. Such an image helps to check the way the diamond gives light back (cut proportions, symmetry etc.).
 
-![ASET illustration](src/readme/ASET.png)
+![ASET illustration](src/readme/ASET.png)\
 *On the left, diamond in natural light. On the right, ASET visualization. Image credits: www.diamondbuyingadvice.com*
 
 ASET images can either be taken with in with an ASET scope, or be computed. Here is how it is built:
 
-![ASET illustration](src/readme/ASET_meaning.png)
+![ASET explanationn](src/readme/ASET_meaning.png)\
+*This is what an ASET image represents* 
 
 On an ASET image, the blue is the light that comes directly from above, the green from the sides, and the red from between the two. The black parts are parts that don't reflect the light at all.
 The ASET image of a high quality diamond should:
@@ -35,12 +37,12 @@ The ASET image of a high quality diamond should:
 - have as much red as possible
 - have blue areas that are very distinct from the red and green ones. This contributes to creating good contrasts between bright and dark areas.
 
-
 To generate an ASET image, orthographic projection should be used to avoid deformations due to perspective projection, especially when being too close to the gem. This project is accurate enough to generate realistic ASET images in real time. For instance, here are the visualizations of a diamond with an ideal brilliant cut, and their decomposition:
 
-![ASET illustration arrows](src/readme/ASET_arrows_decomposition.png)
-*Viewed from top, the arrows of the diamond are visible in the blue component of ASET*
-![ASET illustration hearts](src/readme/ASET_hearts_decomposition.png)
+![ASET illustration arrows](src/readme/ASET_arrows_decomposition.png)\
+*Viewed from top, the arrows of the diamond are visible in the blue component of ASET*\
+\
+![ASET illustration hearts](src/readme/ASET_hearts_decomposition.png)\
 *Viewed from bottom, the hearts of the diamond are visible in the red component of ASET*
 
 ## Implementation details
@@ -80,7 +82,7 @@ A medium such as diamond is defined by a refractive index n, which is defined as
 <table>
     <tr>
         <td>
-            <img src="src/readme/formula_refractive_index.png"/>
+            <img alt="Refractive index definition" src="src/readme/formula_refractive_index.png"/>
         </td>
         <td>
             <ul>
@@ -97,7 +99,7 @@ The speed of light in the medium is defined as:
 <table>
     <tr>
         <td>
-            <img src="src/readme/formula_light_speed.png"/>
+            <img alt="Light speed formula" src="src/readme/formula_light_speed.png"/>
         </td>
         <td>
             <ul>
@@ -115,13 +117,13 @@ When a incident ray r<sub>i</sub> hits an boundary between two media (for instan
 - a part of the ray (r<sub>r</sub>) is reflected
 - another part (r<sub>t</sub>) is transmitted through the medium
 
-<img width="400px" src="src/readme/reflection_refraction.png"/>
+<img alt="Ray splitting illustration" width="400px" src="src/readme/reflection_refraction.png"/>
 
 Here all angles are considered to be in [0, π/2] and are defined relatively to the local normal of the surface.
 The reflected ray has the same angle as the incident ray (θ<sub>i</sub> = θ<sub>r</sub>).
 The relationship between θ<sub>i</sub> and θ<sub>t</sub> is described by Snell's law:
 
-<img src="src/readme/formula_snell.png"/>
+<img alt="Snell's formula" src="src/readme/formula_snell.png"/>
 
 This formula shows that:
 - if the ray is entering a medium with a higher refraction index, the transmitted ray will be closer to the normal than the incident ray;
@@ -133,7 +135,7 @@ The intensity of the incident ray is split between the reflected ray and the tra
 <table>
     <tr>
         <td>
-            <img src="src/readme/formula_energy_split.png"/>
+            <img alt="Ray splitting formula" src="src/readme/formula_energy_split.png"/>
         </td>
         <td>
             <ul>
@@ -147,7 +149,7 @@ The intensity of the incident ray is split between the reflected ray and the tra
 
 Fresnel gives us these coefficients:
 
-<img src="src/readme/formula_fresnel.png"/>
+<img alt="Fresnel formula" src="src/readme/formula_fresnel.png"/>
 
 This formula shows that the closer to the normal the incident ray is, the less reflective the surface is. This phenomenon is very natural and can be observed everywhere: if you are by a lake and look at the water from above, you clearly see the ground underneath the surface (no reflection due to perpendicular incident ray), however if you look at the other side of the lake, you only see the sky reflected by the water surface (high reflection due almost parallel incident ray).
 
@@ -158,11 +160,11 @@ If the light ray is entering a medium with a lower refractive index, the transmi
 
 The critical angle (θ<sub>c</sub>) defines the maximum angle the incident ray can have that creates a transmitted ray. Beyond this angle, the entirety of the incident ray is reflected. This is called a total reflection.
 
-<img width="400px" src="src/readme/total_reflection.png"/>
+<img alt="Total reflection illustration" width="400px" src="src/readme/total_reflection.png"/>
 
 This angle is simply provided by the Snell formula when θ<sub>t</sub> = π/2:
 
-<img src="src/readme/formula_critical_angle.png"/>
+<img alt="Critial angle formula" src="src/readme/formula_critical_angle.png"/>
 
 #### Beer absorption
 No medium is completely transparent: the light is a partially absorbed by the material it is traveling through. The more opaque the medium, the more light is absorbed. This is described by Beer's law:
@@ -170,7 +172,7 @@ No medium is completely transparent: the light is a partially absorbed by the ma
 <table>
     <tr>
         <td>
-            <img src="src/readme/formula_beer.png"/>
+            <img alt="Beer's law formula" src="src/readme/formula_beer.png"/>
         </td>
         <td>
             <ul>
@@ -223,14 +225,15 @@ I implemented a simplified FXAA algorithm:
 1. to avoid treating each color channel separately, I first turn the image into greyscale by computing the luminance of each pixel. The luminance is defined as `(0.299 x red) + (0.587 x green) + (0.114 x blue)`, as suggested by W3C [here](https://www.w3.org/TR/AERT/#color-contrast).
 2. I then determine which areas need antialiasing: for each texel, I sample its luminance and the luminance of the 8 closest neighbours.
 3. I then sort the neighbours into 2 categories: the ones that look like the central texel, and the others
-4. I then use this binary categorization to determine the direction if the edge (if there is one): mostly horizontal or vertical. Below is an example of a texel (in red) that is part of an horizontal edge because the difference between (1, 2, 3) and (6, 7, 8) is greater than the difference between (1, 4, 6) and (3, 5, 8).
-![ASET illustration hearts](src/readme/antialiasing_direction_horizontal.png)
+4. I then use this binary categorization to determine the direction if the edge (if there is one): mostly horizontal or vertical. Below is an example of a texel (in red) that is part of an horizontal edge because the difference between (1, 2, 3) and (6, 7, 8) is greater than the difference between (1, 4, 6) and (3, 5, 8).\
+![Antialiasing explanation](src/readme/antialiasing_direction_horizontal.png)
 5. Finally, I apply a blur in that direction.
 
 This algorithm provides a good antialiasing in one pass with only 9 texture fetches and cheap computation. To improve it, I would need to sample a larger neighbourhood, but I don't think it is worth it.
 
 Here is the result I obtain:
-![ASET illustration hearts](src/readme/antialiasing_magnified_4x.png)
+
+![Antialiasing result](src/readme/antialiasing_magnified_4x.png)\
 *Source image on the left, antialiased image on the right. Notice how most edges are antialiased, while still preserving sharp details such as dots and vertical/horizontal/diagonal lines.*
 
 ## Other approaches
