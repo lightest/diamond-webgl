@@ -16,19 +16,31 @@ The beauty of a diamond resides not only in the purity of the gem, but also in t
 
 One of the most popular diamond cuts is the brilliant cut. Subtle variations in the proportions change greatly the way light is reflected and can make the difference between a mediocre and an ideal diamond. It is described in by a few key lengths:
 
-![Diagram of a_round_brilliant_cut](src/readme/diamond_brilliant_cut.png)\
-*Diagram of a round brilliant cut*
+<div style="text-align:center">
+    <img alt="Diagram of a round brilliant cut" src="src/readme/diamond_brilliant_cut.png"/>
+    <p>
+        <i>Diagram of a round brilliant cut.</i>
+    </p>
+</div>
 
 ### ASET evaluation
 A common tool to evaluate the quality of the diamond cut is the Angular Spectrum Evaluation Tool (ASET) image evaluation. Such an image helps to check the way the diamond gives light back (cut proportions, symmetry etc.).
 
-![ASET illustration](src/readme/ASET.png)\
-*On the left, diamond in natural light. On the right, ASET visualization. Image credits: www.diamondbuyingadvice.com*
+<div style="text-align:center">
+    <img alt="Illustration of ASET image" src="src/readme/ASET.png"/>
+    <p>
+        <i>On the left, diamond in natural light. On the right, ASET visualization. Image credits: www.diamondbuyingadvice.com.</i>
+    </p>
+</div>
 
 ASET images can either be taken with in with an ASET scope, or be computed. Here is how it is built:
 
-![ASET explanationn](src/readme/ASET_meaning.png)\
-*This is what an ASET image represents* 
+<div style="text-align:center">
+    <img alt="Explanation of ASET" src="src/readme/ASET_meaning.png"/>
+    <p>
+        <i>This is what an ASET image represents.</i>
+    </p>
+</div>
 
 On an ASET image, the blue is the light that comes directly from above, the green from the sides, and the red from between the two. The black parts are parts that don't reflect the light at all.
 The ASET image of a high quality diamond should:
@@ -39,11 +51,19 @@ The ASET image of a high quality diamond should:
 
 To generate an ASET image, orthographic projection should be used to avoid deformations due to perspective projection, especially when being too close to the gem. This project is accurate enough to generate realistic ASET images in real time. For instance, here are the visualizations of a diamond with an ideal brilliant cut, and their decomposition:
 
-![ASET illustration arrows](src/readme/ASET_arrows_decomposition.png)\
-*Viewed from top, the arrows of the diamond are visible in the blue component of ASET*\
-\
-![ASET illustration hearts](src/readme/ASET_hearts_decomposition.png)\
-*Viewed from bottom, the hearts of the diamond are visible in the red component of ASET*
+<div style="text-align:center">
+    <img alt="Arrows visible with ASET" src="src/readme/ASET_arrows_decomposition.png"/>
+    <p>
+        <i>Viewed from top, the arrows of the diamond are visible in the blue component of ASET.</i>
+    </p>
+</div>
+
+<div style="text-align:center">
+    <img alt="Hearts visible with ASET" src="src/readme/ASET_hearts_decomposition.png"/>
+    <p>
+        <i>Viewed from bottom, the hearts of the diamond are visible in the red component of ASET.</i>
+    </p>
+</div>
 
 ## Implementation details
 This project uses both the rasterizer and ray tracing:
@@ -70,11 +90,15 @@ In this project, computing the intersection with the triangles would be too expe
 
 It turns out this limitation is not a problem at all because most diamonds are convex.
 
-![Diagram of diamond modeling](src/readme/diamond_as_halfplanes.png)\
-*A diamond can be seen as the intersection of many half-spaces*
+<div style="text-align:center">
+    <img alt="Diagram of diamond modeling" src="src/readme/diamond_as_halfplanes.png"/>
+    <p>
+        <i>A diamond can be seen as the intersection of many half-spaces.</i>
+    </p>
+</div>
 
 The intersection is then seen as the equations:
-<img alt="Formula of ray-plane intersection" src="src/readme/formula_intersection.png"/>
+![Formula of ray-plane intersection](src/readme/formula_intersection.png)
 
 ### Geometrical optics
 The behaviour of light rays as they go through the diamond can be described by a few simple rules.
@@ -119,13 +143,15 @@ When a incident ray r<sub>i</sub> hits an boundary between two media (for instan
 - a part of the ray (r<sub>r</sub>) is reflected
 - another part (r<sub>t</sub>) is transmitted through the medium
 
-<img alt="Ray splitting illustration" width="400px" src="src/readme/reflection_refraction.png"/>
+<div style="text-align:center">
+    <img alt="Illustration of ray splitting" src="src/readme/reflection_refraction.png" width="400px"/>
+</div>
 
 Here all angles are considered to be in [0, π/2] and are defined relatively to the local normal of the surface.
 The reflected ray has the same angle as the incident ray (θ<sub>i</sub> = θ<sub>r</sub>).
 The relationship between θ<sub>i</sub> and θ<sub>t</sub> is described by Snell's law:
 
-<img alt="Snell's formula" src="src/readme/formula_snell.png"/>
+![Snell's formula](src/readme/formula_snell.png)
 
 This formula shows that:
 - if the ray is entering a medium with a higher refraction index, the transmitted ray will be closer to the normal than the incident ray;
@@ -151,7 +177,7 @@ The intensity of the incident ray is split between the reflected ray and the tra
 
 Fresnel gives us these coefficients:
 
-<img alt="Fresnel formula" src="src/readme/formula_fresnel.png"/>
+![Fresnel formula](src/readme/formula_fresnel.png)
 
 This formula shows that the closer to the normal the incident ray is, the less reflective the surface is. This phenomenon is very natural and can be observed everywhere: if you are by a lake and look at the water from above, you clearly see the ground underneath the surface (no reflection due to perpendicular incident ray), however if you look at the other side of the lake, you only see the sky reflected by the water surface (high reflection due almost parallel incident ray).
 
@@ -162,11 +188,13 @@ If the light ray is entering a medium with a lower refractive index, the transmi
 
 The critical angle (θ<sub>c</sub>) defines the maximum angle the incident ray can have that creates a transmitted ray. Beyond this angle, the entirety of the incident ray is reflected. This is called a total reflection.
 
-<img alt="Total reflection illustration" width="400px" src="src/readme/total_reflection.png"/>
+<div style="text-align:center">
+    <img alt="Total reflection illustration" src="src/readme/total_reflection.png" width="400px"/>
+</div>
 
 This angle is simply provided by the Snell formula when θ<sub>t</sub> = π/2:
 
-<img alt="Critial angle formula" src="src/readme/formula_critical_angle.png"/>
+![Formula of the critial angle](src/readme/formula_critical_angle.png)
 
 #### Beer absorption
 No medium is completely transparent: the light is a partially absorbed by the material it is traveling through. The more opaque the medium, the more light is absorbed. This is described by Beer's law:
@@ -188,29 +216,24 @@ No medium is completely transparent: the light is a partially absorbed by the ma
 
 ### Post processing
 
-#### Bloom
-A small bloom effect is performed by:
+#### Sparkel effect
+A small sparkle effect is performed. It is essentially much a bloom with a bidirectional blur:
 1. rendering to an off-screen texture, at full size
 2. copying this texture into a smaller one (to make the next part cheaper) and extracting the bright parts
 3. blurring the small texture (I don't use a gaussian blur, but simply blur in two directions in one pass to create a sparkle effect)
 4. finally, combining both the full-sized and small texture
 
-<table>
-    <tr>
-        <td>
-            <img src="src/readme/bloom_fullsize.png"/>
-        </td>
-        <td>
-            <img src="src/readme/bloom_downsized.png"/>
-        </td>
-        <td>
-            <img src="src/readme/bloom_blurred.png"/>
-        </td>
-        <td>
-            <img src="src/readme/bloom_final.png"/>
-        </td>
-    </tr>
-</table>
+<div style="text-align:center">
+    <div>
+        <img style="width:30%;max-width:512px" src="src/readme/bloom_fullsize.png"/>
+        <img style="width:10%;max-width:64px" src="src/readme/bloom_downsized.png"/>
+        <img style="width:10%;max-width:64px" src="src/readme/bloom_blurred.png"/>
+        <img style="width:30%;max-width:512px" src="src/readme/bloom_final.png"/>
+    </div>
+    <p>
+        <i>These are the steps for the sparkle post-processing effect.</i>
+    </p>
+</div>
 
 #### Antialiasing
 In this scene there are 2 types of aliasing:
@@ -235,8 +258,12 @@ This algorithm provides a good antialiasing in one pass with only 9 texture fetc
 
 Here is the result I obtain:
 
-![Antialiasing result](src/readme/antialiasing_magnified_4x.png)\
-*Source image on the left, antialiased image on the right. Notice how most edges are antialiased, while still preserving sharp details such as dots and vertical/horizontal/diagonal lines.*
+<div style="text-align:center">
+    <img alt="Antialiasing result" src="src/readme/antialiasing_magnified_4x.png"/>
+    <p>
+        <i>Source image on the left, antialiased image on the right. Notice how most edges are antialiased, while still preserving sharp details such as dots and vertical/horizontal/diagonal lines.</i>
+    </p>
+</div>
 
 ## Other approaches
 This ray tracing project is quite processing-heavy for the GPU because for each fragment and each ray rebound, we have to check intersection with all facets of the gem. For a typical diamond, it is 89 intersections. (In reality it is a bit less than this because the shader tries to skip facets that are behind.) The overall complexite is roughly FRAGMENTS_COUNTxREBOUNDS_COUNTxFACETS_COUNTS.
