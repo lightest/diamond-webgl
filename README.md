@@ -98,6 +98,7 @@ It turns out this limitation is not a problem at all because most diamonds are c
 </div>
 
 The intersection is then seen as the equations:
+
 ![Formula of ray-plane intersection](src/readme/formula_intersection.png)
 
 ### Geometrical optics
