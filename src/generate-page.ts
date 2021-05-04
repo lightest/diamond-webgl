@@ -296,7 +296,7 @@ const data = {
                     type: Demopage.supportedControls.Checkbox,
                     title: "Use as skybox",
                     id: "display-skybox-checkbox-id",
-                    checked: false,
+                    checked: true,
                 },
             ]
         },
