@@ -1,14 +1,21 @@
-# TITLE
-INTRO
+# diamond-webgl
+This project is an engine for rendering diamonds and gemstones in real time. It allows precise control of the cut, and customization of various optical properties to simulate countless types of materials. It can also generate ASET images. The precision is more than enough to create the familiar hearts and arrows patterns of ideal cut diamonds.
 
-See it live [here (CHANGE LINK)]().
+The engine runs fully on GPU and uses both rasterization and ray-tracing, as well as post-processing techniques such as bloom and screen-space antialiasing.
 
-## Description
-
-BLABLA DESCRIPTION
+See it live [here](https://piellardj.github.io/diamond-webgl/).
 
 ## Preview
-COOL IMAGES
+
+![Round brilliant cut diamond](src/readme/bloom_final.png)
+
+![Hearts pattern](src/readme/hearts.png)
+
+![Arrows pattern](src/readme/ASET_arrows.png)
+
+![Geometry](src/readme/geometry.png)
+
+![Emerald](src/readme/emerald.png)
 
 ## Diamond
 ### Diamond cut
@@ -26,14 +33,7 @@ One of the most popular diamond cuts is the brilliant cut. Subtle variations in 
 ### ASET evaluation
 A common tool to evaluate the quality of the diamond cut is the Angular Spectrum Evaluation Tool (ASET) image evaluation. Such an image helps to check the way the diamond gives light back (cut proportions, symmetry etc.).
 
-<div style="text-align:center">
-    <img alt="Illustration of ASET image" src="src/readme/ASET.png"/>
-    <p>
-        <i>On the left, diamond in natural light. On the right, ASET visualization. Image credits: www.diamondbuyingadvice.com.</i>
-    </p>
-</div>
-
-ASET images can either be taken with in with an ASET scope, or be computed. Here is how it is built:
+ASET images can either be taken with in with an ASET scope, or be computed. Here is what it represents:
 
 <div style="text-align:center">
     <img alt="Explanation of ASET" src="src/readme/ASET_meaning.png"/>
@@ -252,7 +252,7 @@ I implemented a simplified FXAA algorithm:
 ![Antialiasing explanation](src/readme/antialiasing_direction_horizontal.png)
 5. Finally, I apply a blur in that direction.
 
-This algorithm provides a good antialiasing in one pass with only 9 texture fetches and cheap computation. To improve it, I would need to sample a larger neighbourhood, but I don't think it is worth it.
+This algorithm provides a good antialiasing in one pass with only 9 texture fetches and cheap computation. To improve it, I would need to sample a larger neighbourhood, but I don't think it is worth it. If you want to go further, [here is a great description of FXAA](http://blog.simonrodriguez.fr/articles/30-07-2016_implementing_fxaa.html).
 
 Here is the result I obtain:
 

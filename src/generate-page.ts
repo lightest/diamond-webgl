@@ -5,9 +5,10 @@ import { Demopage } from "webpage-templates";
 
 const data = {
     title: "Diamond",
-    description: "PLACEHOLDER_DESCRIPTION",
+    description: "Ray-tracing engine for real-time diamond rendering in WebGL",
     introduction: [
-        "PLACEHOLDER_INTRODUCTION",
+        "This project is an engine for rendering diamonds and gemstones in real time. It allows precise control of the cut, and customization of various optical properties to simulate countless types of materials. It can also generate ASET images. The precision is more than enough to create the familiar hearts and arrows patterns of ideal cut diamonds.",
+        "The engine runs fully on GPU and uses both rasterization and ray-tracing, as well as post-processing techniques such as bloom and screen-space antialiasing."
     ],
     githubProjectName: "diamond-webgl",
     additionalLinks: [],
@@ -109,15 +110,6 @@ const data = {
                     max: 0.3,
                     value: 0,
                     step: 0.001
-                },
-                {
-                    type: Demopage.supportedControls.Range,
-                    title: "Ray depth",
-                    id: "ray-depth-range-id",
-                    min: 0,
-                    max: 20,
-                    value: 7,
-                    step: 1
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
@@ -227,6 +219,15 @@ const data = {
                             label: "Orthographic"
                         },
                     ]
+                },
+                {
+                    type: Demopage.supportedControls.Range,
+                    title: "Ray depth",
+                    id: "ray-depth-range-id",
+                    min: 0,
+                    max: 20,
+                    value: 7,
+                    step: 1
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,
