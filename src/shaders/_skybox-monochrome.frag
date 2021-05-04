@@ -2,5 +2,5 @@
 
 float sampleSkyboxMonochrome(const vec3 direction) {
     float z = uLightDirection * direction.z;
-    return 0.8 + 0.8 * smoothstep(0.5, 0.7, z) * (1.0 - smoothstep(0.97, 0.98, z));
+    return 0.8 * step(z, 0.975) * (1.0 + step(0.6, z));
 }
