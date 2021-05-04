@@ -186,10 +186,10 @@ No medium is completely transparent: the light is a partially absorbed by the ma
 
 #### Bloom
 A small bloom effect is performed by:
-- rendering to an off-screen texture, at full size
-- copying this texture into a smaller one (to make the next part cheaper) and extracting the bright parts
-- blurring the small texture (I don't use a gaussian blur, but simply blur in two directions in one pass to create a sparkle effect)
-- finally, combining both the full-sized and small texture
+1. rendering to an off-screen texture, at full size
+2. copying this texture into a smaller one (to make the next part cheaper) and extracting the bright parts
+3. blurring the small texture (I don't use a gaussian blur, but simply blur in two directions in one pass to create a sparkle effect)
+4. finally, combining both the full-sized and small texture
 
 <table>
     <tr>
@@ -217,7 +217,21 @@ On my machine, asking for antialiasing with the `antialias` [WebGL flag](https:/
 
 When doing post-processing, I first render a scene to an off-screen texture. Unfortunately, WebGL 1 does not support antialiasing when rendering to a texture. To antialias the scene, I have two options:
 - do a kind of SSAA where I use a texture twice larger than the screen, which I downsize back to screen dimensions later. I cannot do this because it would lead to way too many fragments being processed (each fragment takes a lot of processing power in a ray-tracing application).
-- or apply myself a custom antialiasing such as FXAA, which does not require to upsize any buffer. This is the right approach but I didn't bother.
+- or apply myself antialiasing as a step of post-processing without upsizing any buffer. This is the approach I chose.
+
+I implemented a simplified FXAA algorithm:
+1. to avoid treating each color channel separately, I first turn the image into greyscale by computing the luminance of each pixel. The luminance is defined as `(0.299 x red) + (0.587 x green) + (0.114 x blue)`, as suggested by W3C [here](https://www.w3.org/TR/AERT/#color-contrast).
+2. I then determine which areas need antialiasing: for each texel, I sample its luminance and the luminance of the 8 closest neighbours.
+3. I then sort the neighbours into 2 categories: the ones that look like the central texel, and the others
+4. I then use this binary categorization to determine the direction if the edge (if there is one): mostly horizontal or vertical. Below is an example of a texel (in red) that is part of an horizontal edge because the difference between (1, 2, 3) and (6, 7, 8) is greater than the difference between (1, 4, 6) and (3, 5, 8).
+![ASET illustration hearts](src/readme/antialiasing_direction_horizontal.png)
+5. Finally, I apply a blur in that direction.
+
+This algorithm provides a good antialiasing in one pass with only 9 texture fetches and cheap computation. To improve it, I would need to sample a larger neighbourhood, but I don't think it is worth it.
+
+Here is the result I obtain:
+![ASET illustration hearts](src/readme/antialiasing_magnified_4x.png)
+*Source image on the left, antialiased image on the right. Notice how most edges are antialiased, while still preserving sharp details such as dots and vertical/horizontal/diagonal lines.*
 
 ## Other approaches
 This ray tracing project is quite processing-heavy for the GPU because for each fragment and each ray rebound, we have to check intersection with all facets of the gem. For a typical diamond, it is 89 intersections. (In reality it is a bit less than this because the shader tries to skip facets that are behind.) The overall complexite is roughly FRAGMENTS_COUNTxREBOUNDS_COUNTxFACETS_COUNTS.

@@ -104,6 +104,7 @@ class PostProcessing {
             {
                 compositingShader.a["aCorner"].VBO = this.squareVBO;
                 compositingShader.u["uFullsizeTexture"].value = this.fullSizeTexture.texture;
+                compositingShader.u["uFullsizeTextureTexelSize"].value = [1 / this.fullSizeTexture.width, 1 / this.fullSizeTexture.height];
                 compositingShader.u["uBlurredTexture"].value = this.downsizedBlurredTexture.texture;
 
                 compositingShader.use();

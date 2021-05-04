@@ -17,6 +17,7 @@ function main(): void {
 
     const webglFlags = {
         alpha: false,
+        antialias: false,
         depth: false,
         stencil: false,
         preserveDrawingBuffer: false,
