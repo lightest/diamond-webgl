@@ -7,7 +7,7 @@ const data = {
     title: "Diamond",
     description: "Ray-tracing engine for real-time diamond rendering in WebGL",
     introduction: [
-        "This project is an engine for rendering diamonds and gemstones in real time. It allows precise control of the cut, and customization of various optical properties to simulate countless types of materials. It can also generate ASET images. The precision is more than enough to create the familiar hearts and arrows patterns of ideal cut diamonds.",
+        "This is a real-time rendering engine for diamonds and gemstones. It allows precise control of the cut, and customization of various optical properties to simulate countless types of materials. It can also generate ASET images. The precision is more than enough to create the familiar hearts and arrows patterns of ideal cut diamonds.",
         "The engine runs fully on GPU and uses both rasterization and ray-tracing, as well as post-processing techniques such as bloom and screen-space antialiasing."
     ],
     githubProjectName: "diamond-webgl",
