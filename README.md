@@ -68,11 +68,13 @@ In this project, computing the intersection with the triangles would be too expe
 - computing the intersection with a plane is way less expensive
 - a typical diamond is made of 176 triangles but only 89 facets.
 
-It turns out this limitation is not a problem at all because most diamonds are convex. 
-<img src="src/readme/diamond_as_halfplanes.png"/>
+It turns out this limitation is not a problem at all because most diamonds are convex.
+
+![Diagram of diamond modeling](src/readme/diamond_as_halfplanes.png)\
+*A diamond can be seen as the intersection of many half-spaces*
 
 The intersection is then seen as the equations:
-<img src="src/readme/formula_intersection.png"/>
+<img alt="Formula of ray-plane intersection" src="src/readme/formula_intersection.png"/>
 
 ### Geometrical optics
 The behaviour of light rays as they go through the diamond can be described by a few simple rules.
