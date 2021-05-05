@@ -21,7 +21,7 @@ See it live [here](https://piellardj.github.io/diamond-webgl/).
 ### Diamond cut
 The beauty of a diamond resides not only in the purity of the gem, but also in the way it is cut. The purity affects mostly light absorption, while the cut affects the way light is reflected. The goal is to reflect as much light as possible towards the viewer (that is, towards the top of the gem) so that the diamond appears the brightest.
 
-One of the most popular diamond cuts is the brilliant cut. Subtle variations in the proportions change greatly the way light is reflected and can make the difference between a mediocre and an ideal diamond. It is described in by a few key lengths:
+One of the most popular diamond cuts is the brilliant cut. Subtle variations in the proportions change greatly the way light is reflected and can make the difference between a mediocre and an ideal diamond. It is described by a few key lengths:
 
 <div style="text-align:center">
     <img alt="Diagram of a round brilliant cut" src="src/readme/diamond_brilliant_cut.png"/>
@@ -31,7 +31,7 @@ One of the most popular diamond cuts is the brilliant cut. Subtle variations in 
 </div>
 
 ### ASET evaluation
-A common tool to evaluate the quality of the diamond cut is the Angular Spectrum Evaluation Tool (ASET) image evaluation. Such an image helps to check the way the diamond gives light back (cut proportions, symmetry etc.).
+A common tool to evaluate the quality of the cut of a diamond is the Angular Spectrum Evaluation Tool (ASET). Such an image helps to check the way the diamond gives light back, which depends on the cut quality and the clarity of the gem.
 
 ASET images can either be taken with in with an ASET scope, or be computed. Here is what it represents:
 
@@ -67,14 +67,14 @@ To generate an ASET image, orthographic projection should be used to avoid defor
 
 ## Implementation details
 This project uses both the rasterizer and ray tracing:
-- the rasterizer is used to get the entry point of the light ray in the diamond, and the surface normal at this point
+- the rasterizer is used to determine where the ray coming from the camera enters the diamond, as well as the surface normal at this point
 - then ray tracing is used to compute the trajectory of the ray inside the gem.
 
-The main parts are:
+This project is made of 4 main parts:
 - modeling the diamond
+- detection of intersections between the light ray and the surface of the diamond. This needs to be efficient because it will be performed at most 20 times per fragment, since the ray bounces from facet to facet
 - simulating the behaviour of light using laws of geometrical optics
-- detection of intersections between the light ray and the surface of the diamond. This needs to be efficient because it will be performed at most 20 times per fragment.
-- a bit of post processing
+- a bit of post-processing
 
 ### Modeling and ray tracing
 The base operation in ray tracing is to detect collisions between light rays and geometry (triangles).
@@ -84,7 +84,7 @@ A ray intersects a triangle if and only if:
 - an intersection point exists that is both on the trajectory of the ray, and the plane of the triangle
 - this point is inside the triangle, between its 3 vertices. To test this, a triple dot product can be used to check that the point is on the same side of all 3 edges.
 
-In this project, computing the intersection with the triangles would be too expensive. As an optimization, it is possible to skip the second part if I limit myself to convex shapes. I can then define the diamond as the intersection of all the half-spaces formed by the facets. This is very handy because:
+In this project, checking that the intersection is within the triangles would be too expensive. As an optimization, it is possible to skip this part if I limit myself to convex shapes. I can then define the diamond as the intersection of all the half-spaces formed by the facets. This is very handy because:
 - computing the intersection with a plane is way less expensive
 - a typical diamond is made of 176 triangles but only 89 facets.
 
@@ -180,14 +180,14 @@ Fresnel gives us these coefficients:
 
 ![Fresnel formula](src/readme/formula_fresnel.png)
 
-This formula shows that the closer to the normal the incident ray is, the less reflective the surface is. This phenomenon is very natural and can be observed everywhere: if you are by a lake and look at the water from above, you clearly see the ground underneath the surface (no reflection due to perpendicular incident ray), however if you look at the other side of the lake, you only see the sky reflected by the water surface (high reflection due almost parallel incident ray).
+This formula shows that the closer to the normal the incident ray is, the less reflective the surface is. This phenomenon is very natural and can be observed everywhere: if you are by a lake and look at the water at your feet, you clearly see the ground underneath the surface (no reflection due to perpendicular incident ray), however if you look in the distance, you only see the sky reflected by the water surface (high reflection due almost parallel incident ray).
 
 
 #### Total reflection
 
 If the light ray is entering a medium with a lower refractive index, the transmitted ray will be further away to the surface than the incident ray.
 
-The critical angle (θ<sub>c</sub>) defines the maximum angle the incident ray can have that creates a transmitted ray. Beyond this angle, the entirety of the incident ray is reflected. This is called a total reflection.
+The critical angle (θ<sub>c</sub>) defines the maximum angle the incident ray can have to create a transmitted ray. Beyond this angle, the entirety of the incident ray is reflected. This is called a total reflection.
 
 <div style="text-align:center">
     <img alt="Total reflection illustration" src="src/readme/total_reflection.png" width="400px"/>
@@ -217,8 +217,8 @@ No medium is completely transparent: the light is a partially absorbed by the ma
 
 ### Post processing
 
-#### Sparkel effect
-A small sparkle effect is performed. It is essentially much a bloom with a bidirectional blur:
+#### Sparkle effect
+A small sparkle effect is performed. It is essentially a bloom with a bidirectional blur:
 1. rendering to an off-screen texture, at full size
 2. copying this texture into a smaller one (to make the next part cheaper) and extracting the bright parts
 3. blurring the small texture (I don't use a gaussian blur, but simply blur in two directions in one pass to create a sparkle effect)
