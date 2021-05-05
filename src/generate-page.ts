@@ -201,7 +201,7 @@ const data = {
                     type: Demopage.supportedControls.ColorPicker,
                     title: "Background",
                     id: "background-color-picker-id",
-                    defaultValueHex: "#000000",
+                    defaultValueHex: "#CCCCCC",
                 },
                 {
                     type: Demopage.supportedControls.Tabs,
@@ -296,7 +296,7 @@ const data = {
                     type: Demopage.supportedControls.Checkbox,
                     title: "Use as skybox",
                     id: "display-skybox-checkbox-id",
-                    checked: true,
+                    checked: false,
                 },
             ]
         },
