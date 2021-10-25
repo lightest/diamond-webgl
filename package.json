@@ -1,5 +1,6 @@
 {
   "name": "diamond-webgl",
+  "version": "1.0.0",
   "homepage": "https://piellardj.github.io/diamond-webgl",
   "description": "Ray-tracing engine for real-time diamond rendering in WebGL",
   "scripts": {
